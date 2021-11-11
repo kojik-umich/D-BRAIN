@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="docs">
+      <UniqueIdentifier>{df93b51d-febe-4934-9951-9a4d8e53db05}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="docs\D-BS_CUI.cd">
+      <Filter>docs</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\D-BS_CUI\BS_FileOut.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\D-BS_CUI\BS_main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\D-BS_CUI\BS_Calculator.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\D-BS_CUI\BS_FileIn.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\D-BS_CUI\BS_Simulink.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\D-BS_CUI\BS_SimulinkIn.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\D-BS_CUI\BS_FileOut.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\D-BS_CUI\BS_Calculator.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\D-BS_CUI\BS_FileIn.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\D-BS_CUI\BS_Simulink.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\D-BS_CUI\BS_SimulinkIn.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

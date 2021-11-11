@@ -1,0 +1,162 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="BS_In">
+    <Position X="0.5" Y="0.5" Width="2" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Struct Name="BS_In::Tribology">
+        <Compartments>
+          <Compartment Name="Nested Types" Collapsed="false" />
+        </Compartments>
+        <NestedTypes>
+          <Enum Name="BS_In::Tribology::RollingResistance">
+            <TypeIdentifier>
+              <NewMemberFileName>include\D-BS\BS_In.h</NewMemberFileName>
+            </TypeIdentifier>
+          </Enum>
+          <Enum Name="BS_In::Tribology::Coulomb">
+            <TypeIdentifier>
+              <NewMemberFileName>include\D-BS\BS_In.h</NewMemberFileName>
+            </TypeIdentifier>
+          </Enum>
+          <Enum Name="BS_In::Tribology::FilmThickness">
+            <TypeIdentifier>
+              <NewMemberFileName>include\D-BS\BS_In.h</NewMemberFileName>
+            </TypeIdentifier>
+          </Enum>
+        </NestedTypes>
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_In.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="BS_In::Cylinder">
+        <Compartments>
+          <Compartment Name="Nested Types" Collapsed="false" />
+        </Compartments>
+        <NestedTypes>
+          <Struct Name="BS_In::Cylinder::Spiral">
+            <Compartments>
+              <Compartment Name="Nested Types" Collapsed="false" />
+            </Compartments>
+            <NestedTypes>
+              <Struct Name="BS_In::Cylinder::Spiral::Groove">
+                <TypeIdentifier>
+                  <NewMemberFileName>include\D-BS\BS_In.h</NewMemberFileName>
+                </TypeIdentifier>
+              </Struct>
+            </NestedTypes>
+            <TypeIdentifier>
+              <NewMemberFileName>include\D-BS\BS_In.h</NewMemberFileName>
+            </TypeIdentifier>
+          </Struct>
+        </NestedTypes>
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_In.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="BS_In::Circuit">
+        <Compartments>
+          <Compartment Name="Nested Types" Collapsed="false" />
+        </Compartments>
+        <NestedTypes>
+          <Struct Name="BS_In::Circuit::Ball">
+            <TypeIdentifier>
+              <NewMemberFileName>include\D-BS\BS_In.h</NewMemberFileName>
+            </TypeIdentifier>
+          </Struct>
+        </NestedTypes>
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_In.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="BS_In::Oil">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_In.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="BS_In::Load">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_In.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="BS_In::Rigid">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_In.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="BS_In::Bound">
+        <Compartments>
+          <Compartment Name="Nested Types" Collapsed="false" />
+        </Compartments>
+        <NestedTypes>
+          <Enum Name="BS_In::Bound::Mass">
+            <TypeIdentifier>
+              <NewMemberFileName>include\D-BS\BS_In.h</NewMemberFileName>
+            </TypeIdentifier>
+          </Enum>
+        </NestedTypes>
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_In.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>ACIAACABCIBAAAAAAAAAAAAABABAAAAAAAACAAAAAAA=</HashCode>
+      <FileName>include\D-BS\BS_In.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS_Out">
+    <Position X="3.5" Y="0.5" Width="2" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Struct Name="BS_Out::Rigid">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_Out.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="BS_Out::Circuit">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_Out.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="BS_Out::Cylinder">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_Out.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="BS_Out::BallCylinderPair">
+        <Compartments>
+          <Compartment Name="Nested Types" Collapsed="false" />
+        </Compartments>
+        <NestedTypes>
+          <Struct Name="BS_Out::BallCylinderPair::Groove">
+            <TypeIdentifier>
+              <NewMemberFileName>include\D-BS\BS_Out.h</NewMemberFileName>
+            </TypeIdentifier>
+          </Struct>
+        </NestedTypes>
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_Out.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="BS_Out::BallBallPair">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_Out.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>ASQAAAAAAAAAAAAQAAAAAAAAAUAIAAAAAAAAAAAAYAA=</HashCode>
+      <FileName>include\D-BS\BS_Out.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Consolas" Size="9" />
+</ClassDiagram>

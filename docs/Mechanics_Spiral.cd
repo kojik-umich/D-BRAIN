@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Ball" Collapsed="true">
+    <Position X="5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAIAAAAAAAABAAAAAAAAAAAAAISAAABBAAAAAA=</HashCode>
+      <FileName>include\Mechanics\ball.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BallBallPair" Collapsed="true">
+    <Position X="2.75" Y="7.75" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEA=</HashCode>
+      <FileName>include\Mechanics\ball.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="BL" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Rigid" Collapsed="true">
+    <Position X="5" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>FCQBUCAAEASCAABAQAAJAEEAEEDgwISJBjzAEikEIAA=</HashCode>
+      <FileName>include\Mechanics\rigid.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Spiral">
+    <Position X="8.25" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAARAAAAAAAAABAABAAAAIgAAAAEIABAADAACAASA=</HashCode>
+      <FileName>include\Mechanics\spiral.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Consolas" Size="9" />
+</ClassDiagram>

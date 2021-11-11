@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{1502606a-37d2-4e51-a82c-079885136173}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\D-BS\BS_CylinderTest.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\D-BS\pch.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\D-BS\BS_ShaftTest.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\D-BS\BS_BallCylinderPairTest.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\D-BS\Stab_Tribology.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\D-BS\BS_BallScrewTest.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\D-BS\BS_FileIn_stab.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\D-BS\pch.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\D-BS\BS_FileOut_stab.h">
+      <Filter>src</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\D-BS\packages.config">
+      <Filter>src</Filter>
+    </None>
+  </ItemGroup>
+</Project>

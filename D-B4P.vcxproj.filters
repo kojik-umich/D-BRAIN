@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="ctest">
+      <UniqueIdentifier>{03279c0e-ca00-4cfd-bcec-839353091216}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ctest\src">
+      <UniqueIdentifier>{1889dc18-6dce-4d4d-9e8e-3e28af4a3fa2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="docs">
+      <UniqueIdentifier>{bff3ee54-534d-4755-9028-3b328d844973}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ctest\src\TribologyTest.cpp">
+      <Filter>ctest\src</Filter>
+    </ClCompile>
+    <ClCompile Include="ctest\src\UnitTest.cpp">
+      <Filter>ctest\src</Filter>
+    </ClCompile>
+    <ClCompile Include="ctest\src\b4p_BearingTest.cpp">
+      <Filter>ctest\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\D-B4P\b4p_BallCagePair.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\D-B4P\b4p_BallRingPair.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\D-B4P\b4p_Bearing.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\D-B4P\b4p_Ring.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\D-B4P\bal_Cage.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\D-B4P\b4p_BallCagePair.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\D-B4P\b4p_BallRingPair.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\D-B4P\b4p_Bearing.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\D-B4P\b4p_In.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\D-B4P\b4p_Out.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\D-B4P\b4p_Ring.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\D-B4P\bal_Cage.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="docs\D-B4P.cd">
+      <Filter>docs</Filter>
+    </None>
+  </ItemGroup>
+</Project>

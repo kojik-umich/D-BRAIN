@@ -1,0 +1,7 @@
+Please use the following information when submitting customer support requests
+
+Package ID: w_ode_a_1.0.0.006
+Package Contents: Intel(R) ODE Solver Library for Windows*
+
+
+* Other names and brands may be claimed as the property of others.

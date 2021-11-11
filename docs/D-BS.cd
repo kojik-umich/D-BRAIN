@@ -1,0 +1,246 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="BS_BallCylinderPair" Collapsed="true">
+    <Position X="7.5" Y="1.25" Width="1.5" />
+    <NestedTypes>
+      <Struct Name="BS_BallCylinderPair::Groove" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_BallCylinderPair.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="BS_BallCylinderPair::Lubrication" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_BallCylinderPair.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>ABUAAAAwAAiQEAAAAQBAAQAAQBAAQCAAQogAAgAAGEA=</HashCode>
+      <FileName>include\D-BS\BS_BallCylinderPair.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="CY" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="BS_BallNutPair" Collapsed="true">
+    <Position X="8.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAABAAYAAAAAAAAAAAA=</HashCode>
+      <FileName>include\D-BS\BS_BallCylinderPair.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS_BallShaftPair" Collapsed="true">
+    <Position X="6.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAACAAAABAAYAAAAAAAAAAAA=</HashCode>
+      <FileName>include\D-BS\BS_BallCylinderPair.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS_BallScrew" Collapsed="true">
+    <Position X="5" Y="0.5" Width="1.5" />
+    <NestedTypes>
+      <Struct Name="BS_BallScrew::Static" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_BallScrew.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AQQAIAEQAQyAQACAAAAACiEEIEBAAAIAAACAAAABYEA=</HashCode>
+      <FileName>include\D-BS\BS_BallScrew.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="BNP" />
+      <Field Name="BSP" />
+      <Field Name="NT" />
+      <Field Name="ST" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="BS_Cylinder" Collapsed="true">
+    <Position X="9.75" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ADAAAAAAACAAIAgAhABAhEQCBIACgAIAgAAAAAAAAAA=</HashCode>
+      <FileName>include\D-BS\BS_Cylinder.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="SP" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="BS_In">
+    <Position X="10.5" Y="2.25" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Enum Name="BS_In::FilmThickness" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_In.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Struct Name="BS_In::Nut" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_In.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="BS_In::Shaft" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_In.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="BS_In::Preload" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_In.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="BS_In::DynBound" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_In.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Enum Name="BS_In::RollingResistance" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_In.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Struct Name="BS_In::Ball" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_In.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="BS_In::Oil" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_In.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Enum Name="BS_In::Coulomb" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_In.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Struct Name="BS_In::SttLoad" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_In.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>ASCAgCgBCRBAEABACAQAAAAAJABAAAAAAYAEhAAAIAA=</HashCode>
+      <FileName>include\D-BS\BS_In.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS_Nut">
+    <Position X="1.75" Y="0.75" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Class Name="BS_Nut::Cylinder" Collapsed="true">
+        <NestedTypes>
+          <Struct Name="BS_Nut::Cylinder::Circuit" Collapsed="true">
+            <TypeIdentifier>
+              <NewMemberFileName>include\D-BS\BS_Nut.h</NewMemberFileName>
+            </TypeIdentifier>
+          </Struct>
+        </NestedTypes>
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_Nut.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>ACQAAAAAAAQAAAAACAAAAAgBAAwAQAIAAAAQAAAABEA=</HashCode>
+      <FileName>include\D-BS\BS_Nut.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS_SingleNut" Collapsed="true">
+    <Position X="2.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACQAAAAAAAQAAAAAAAAAAAgAAAAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>include\D-BS\BS_Nut.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS_DoubleNut" Collapsed="true">
+    <Position X="0.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACQAAAAAAAQAAAAAAAAAAAgAAAAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>include\D-BS\BS_Nut.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS_Out">
+    <Position X="12.5" Y="2.25" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Struct Name="BS_Out::Rigid" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_Out.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="BS_Out::Cylinder" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_Out.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="BS_Out::BallCylinderPair" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_Out.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="BS_Out::BallBallPair" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_Out.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>ASAAAAAQAAAAAAAAAAAAAAACAUAIAAAAAAEAAAAAYAA=</HashCode>
+      <FileName>include\D-BS\BS_Out.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS_Shaft">
+    <Position X="4.5" Y="2.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Class Name="BS_Shaft::Cylinder" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_Shaft.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>ACQAAAAAAAQAAAAAAAAAAAoAABxAQAIAEACQAAAAAAA=</HashCode>
+      <FileName>include\D-BS\BS_Shaft.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS_Spiral" Collapsed="true">
+    <Position X="11.75" Y="1.25" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Struct Name="BS_Spiral::Groove" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-BS\BS_Spiral.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>ACAAAQAAAAAAAAAAAABAAAAAgIAAAEIAAhAAAAAAACA=</HashCode>
+      <FileName>include\D-BS\BS_Spiral.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Consolas" Size="9" />
+</ClassDiagram>

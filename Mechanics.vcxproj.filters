@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{2d5a4eda-377a-42f8-bf28-02cc4fcc3f3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{c80c1264-57bb-474f-b2bf-a882bd82d6f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="docs">
+      <UniqueIdentifier>{032dd061-5d18-4513-bb3b-d6ee66969f6b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Mechanics\Ball.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Mechanics\Numeric.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Mechanics\rigid.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Mechanics\spiral.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Mechanics\Tribology.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Mechanics\Unit.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Mechanics\ball.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mechanics\Numeric.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mechanics\rigid.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mechanics\spiral.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mechanics\Tribology.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mechanics\Unit.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="docs\Mechanics.cd">
+      <Filter>docs</Filter>
+    </None>
+    <None Include="docs\Mechanics_Spiral.cd">
+      <Filter>docs</Filter>
+    </None>
+  </ItemGroup>
+</Project>

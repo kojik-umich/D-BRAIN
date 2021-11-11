@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="B4P_BallCagePair" Collapsed="true">
+    <Position X="4.75" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABABARAACAAAAABAABAAAAAAAAAAIAQkAQEAAAAEA=</HashCode>
+      <FileName>include\D-B4P\B4P_BallCagePair.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="CG" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="B4P_BallRingPair" Collapsed="true">
+    <Position X="3.75" Y="5.75" Width="1.5" />
+    <NestedTypes>
+      <Struct Name="B4P_BallRingPair::Groove" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>include\D-B4P\B4P_BallRingPair.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>IBUQABIxAACW1AJABAABAQCQQBAAAAIQQwiAAoBAAEA=</HashCode>
+      <FileName>include\D-B4P\B4P_BallRingPair.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="RG" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="B4P_BallOuterRingPair" Collapsed="true">
+    <Position X="2.5" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAACAAAAAAAAAAAAAAAAAQIAAAAAAAAAAAA=</HashCode>
+      <FileName>include\D-B4P\B4P_BallRingPair.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="B4P_BallInnerRingPair" Collapsed="true">
+    <Position X="4.75" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAACAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>include\D-B4P\B4P_BallRingPair.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="B4P_Bearing" Collapsed="true">
+    <Position X="7.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CCAJAAAwAAaCAAAIMAAAAAAIAABKIAIAAACAAAABACU=</HashCode>
+      <FileName>include\D-B4P\B4P_Bearing.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="BCP" />
+      <Field Name="BIP" />
+      <Field Name="BOP" />
+      <Field Name="CG" />
+      <Field Name="IR" />
+      <Field Name="OR" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="B4P_In" Collapsed="true">
+    <Position X="10.25" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACCAAAgxAAMAAAAIAIACAAAAAQBKAAAAAAAAEAAUEGA=</HashCode>
+      <FileName>include\D-B4P\B4P_In.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="B4P_Out" Collapsed="true">
+    <Position X="12" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACQBAAAQAAIAAAAIAAAAAAAAAAAKAAAAAAAARAAAACA=</HashCode>
+      <FileName>include\D-B4P\B4P_Out.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="B4P_Ring" Collapsed="true">
+    <Position X="6.75" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAACAAAAAAAAAChAAAAAAAAAIQRgCAAgAABAA=</HashCode>
+      <FileName>include\D-B4P\B4P_Ring.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="B4P_OuterRing" Collapsed="true">
+    <Position X="5.5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>include\D-B4P\B4P_Ring.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="B4P_InnerRing" Collapsed="true">
+    <Position X="7.75" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>include\D-B4P\B4P_Ring.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="bal_Cage" Collapsed="true">
+    <Position X="2.5" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAAAAAAAAAAAAAAAAACAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>include\D-B4P\bal_Cage.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="bal_SnapCage" Collapsed="true">
+    <Position X="2.5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ICAAAAAAAAAAEIiAAAAAAAACACAAAAIAAAAACQAAAAE=</HashCode>
+      <FileName>include\D-B4P\bal_Cage.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Consolas" Size="9" />
+</ClassDiagram>
