@@ -55,7 +55,6 @@ Vector3d BS_Cylinder::to_inertialvelocity
 	return v__;
 }
 
-
 // 螺旋位相角から変換行列をセットするメソッド．
 Matrix3d BS_Cylinder::get_xyz2eta
 (
