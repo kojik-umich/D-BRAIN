@@ -97,7 +97,7 @@ public:
 	void save_F0(int i, const Vector3d & p, double F, const Vector3d & eta, double a, const Vector2d & Fbc);
 	void get_F1(bool v, Vector2d & Fbc, Vector3d & Fcb, Vector3d & Tcb);
 	void get_F2(Vector3d & vF, Vector3d & vT);
-	void get_dyn_F0(bool direction, Vector3d & Fbc, Vector3d & Fcb, Vector3d & Tcb);
+	void get_dyn_F0(bool direction, Vector3d & etav, Vector3d & Fbc, Vector3d & Fcb, Vector3d & Tcb);
 	void get_FT(Vector3d & Fbc, Vector3d & Tbc, Vector3d & Tcb, Vector3d & Fs, Vector3d & Ts);
 	Vector3d get_ur(const Vector3d & p);
 	Vector3d get_us(const Vector3d & p);

@@ -129,13 +129,21 @@ void BS_Shaft::init_dyn0(void) {
 	return;
 }
 
+void BS_Shaft::deinit_dyn0(void) {
+
+	this->v = this->mem.v;
+	this->w = this->mem.w;
+
+	return;
+}
+
 // step0（剛性計算）用のインタフェイス．
 void BS_Shaft::get_dyn_y0(double*y0) {
 
 	for (int i = 0; i < 3; i++) {
-		y0[i + 0] = this->x[i];
-		y0[i + 3] = this->v[i];
-		y0[i + 8] = this->w[i];
+		y0[i + 0] = this->x[i] / Rigid::l;
+		y0[i + 3] = this->v[i] / Rigid::l * Rigid::t;
+		y0[i + 8] = this->w[i] * Rigid::t;
 	}
 	y0[6] = this->q.y() * 2;
 	y0[7] = this->q.z() * 2;
@@ -149,13 +157,16 @@ void BS_Shaft::set_dyn_y0(const double*y0) {
 	using namespace Numeric;
 
 	Vector3d x_now = this->x;
-	Vector3d x = this->x_const.select(x_now, Vector3d(y0[0], y0[1], y0[2])) * Rigid::l;
-	Vector3d v = Vector3d(y0[3], y0[4], y0[5]) * Rigid::l / Rigid::t;
+	Vector3d x = this->x_const.select(x_now, Vector3d(y0[0], y0[1], y0[2]))
+		* Rigid::l;
+	Vector3d v = Vector3d(y0[3], y0[4], y0[5]) 
+		* Rigid::l / Rigid::t;
 
 	Vector3d t_now = 2 * Vector3d(0, this->q.y(), this->q.z());
 	Vector3d t = this->Rx_const.select(t_now, Vector3d(0, y0[6], y0[7]));
 	double   tw = sqrt(1.0 - Square(0.5*t.y()) - Square(0.5*t.z()));
-	Vector3d w = Vector3d(y0[8], y0[9], y0[10]) / Rigid::t;
+	Vector3d w = Vector3d(y0[8], y0[9], y0[10])
+		/ Rigid::t;
 
 	this->x = x;
 	this->v = v;

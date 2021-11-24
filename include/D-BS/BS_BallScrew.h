@@ -54,7 +54,8 @@ public:
 	void get_F2(double*f2);
 
 	void set_dyn_y0(const double * y0);
-	void init_dyn0(double * y0);
+	void init_dyn0(void);
+	void deinit_dyn0(void);
 	void get_dyn_y0(double * y0);
 	void get_dyn_dydt0(double * y);
 

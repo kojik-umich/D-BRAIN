@@ -26,6 +26,7 @@ public:
 	void set_dx(void);
 	void set_y_(const Vector3d & x, const Vector3d & v, const Quaterniond & q, const Vector3d & w);
 	void init_dyn0(void);
+	void deinit_dyn0(void);
 	void set_dyn_y0(const double * y0);
 	void get_dyn_y0(double * y0);
 	void get_dydt_(const Vector3d & F, const Vector3d & T, double dvdt, double dwdt, double * dydt);

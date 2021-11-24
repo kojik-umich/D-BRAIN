@@ -194,8 +194,6 @@ int main(int argc, char *argv[]) {
 
 		else {
 			std::cout << "おおよその位置へシャフトを移動します．" << std::endl;
-			if (calc.BS.shaft_DOF() < 5)
-				std::cout << "完全非拘束でない場合の簡易計算は推奨されません．ねじ位置は入力拘束値と異なる変位に固定されます．" << std::endl;
 
 			calc.BS.preset_y0(1e-9, 1e-12, 1e-9);
 		}
@@ -221,14 +219,16 @@ int main(int argc, char *argv[]) {
 			std::cout << "は入力が0であったため行いません．" << std::endl;
 
 		else {
-			int i = 0;
+			const int i = 0;
 			double  *y = new double[BS_Calculator::dyn.set[i].nX];
 			VectorXd y_temp = VectorXd(1);
 			double t0[2];
 			t0[0] = 0;	t0[1] = BS_Calculator::dyn.set[i].t_step;
+			calc.BS.init_dyn0();
 			calc.BS.get_dyn_y0(y);
-
 			sub_Dynamic(calc, FO, i, t0, y, Temp, FI.dyn.set[i].stopcalc, y_temp, FI.dyn.set[i].dTerr, FI.dyn.set[i].stp);
+			calc.BS.deinit_dyn0();
+
 			//double *x1 = new double[BS_Calculator::stt.set[1].n];
 			//calc.BS.get_y0(x1);
 			//int RCI_Request = BS_Calculator::Stt_solve(1, x1);
@@ -268,6 +268,8 @@ int main(int argc, char *argv[]) {
 	t1[1] = BS_Calculator::dyn.set[_DYN_LAST_].t_step + t_str;
 	y_[0] = t1[0];
 	calc.BS.get_dyn_y1(y);
+
+	std::cout << "\t y[13]\t" << y[13] << "\t dydt[13]\t" << t1[1] << std::endl;
 
 	// 前回計算結果を消去し，初期状態での座標・速度をtempに出力
 	if (FI.output.deletelastout) {
@@ -333,8 +335,9 @@ int sub_Dynamic(BS_Calculator & calc, BS_FileOut&FO, int i, double*t, double*y, 
 		if (i == _DYN_LAST_) {
 			y_[0] = t[0];
 			calc.BS.get_dyn_y1(y);
-			for (int i = 0; i < BS_Calculator::dyn.set[i].nX; i++)
-				y_[i + 1] = y[i];
+
+			for (int j = 0; j < BS_Calculator::dyn.set[i].nX; j++)
+				y_[j + 1] = y[j];
 			FileOut::write_vector(Temp, y_, 15);
 		}
 		// enterキーを押したらループ中断
@@ -364,6 +367,7 @@ int sub_Dynamic(BS_Calculator & calc, BS_FileOut&FO, int i, double*t, double*y, 
 		}
 		if (finished)
 			break;
+
 	}
 	std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
 	double elapsed = double(std::chrono::duration_cast<std::chrono::seconds>(end - start).count());
@@ -412,3 +416,5 @@ int sub_Dynamic(BS_Calculator & calc, BS_FileOut&FO, int i, double*t, double*y, 
 	//}
 
 
+			//if (calc.BS.shaft_DOF() < 5)
+			//	std::cout << "完全非拘束でない場合の簡易計算は推奨されません．ねじ位置は入力拘束値と異なる変位に固定されます．" << std::endl;

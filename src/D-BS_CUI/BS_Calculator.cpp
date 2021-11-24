@@ -213,7 +213,7 @@ void BS_Calculator::Stt_Eq2(
 void BS_Calculator::init_dyn(const BS_FileIn::Dynamic&dyn, int ballnum) {
 
 	// 動解析設定
-	BS_Calculator::dyn.set[0].nX = 4 * ballnum + 11;
+	BS_Calculator::dyn.set[0].nX = 5 * ballnum + 11;
 	BS_Calculator::dyn.set[1].nX = 13 * (ballnum + 2);
 
 	for (int i = 0; i < 2; i++) {
@@ -248,8 +248,6 @@ void BS_Calculator::Dyn_Eq0(int*n, double*t, double*y, double*dydt) {
 
 	BS.set_dyn_y0(y);
 	BS.get_dyn_dydt0(dydt);
-
-	//std::cout << "y[10]" << y[10] << ",\t dydt[0]" << dydt[10] << std::endl;
 
 	return;
 }

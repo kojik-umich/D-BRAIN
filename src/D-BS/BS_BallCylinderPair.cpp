@@ -6,6 +6,7 @@
 !
 !*******************************************************************************/
 #include "BS_BallCylinderPair.h"
+const int nGV = 2;
 
 // どの円筒のどの螺旋に紐づくかを定義する．
 void BS_BallCylinderPair::link(Ball*BL, BS_Cylinder*CY, int is) {
@@ -18,17 +19,17 @@ void BS_BallCylinderPair::link(Ball*BL, BS_Cylinder*CY, int is) {
 
 // 現在の状態での玉の接触判定および，そのときの接触状態を計算する．
 bool BS_BallCylinderPair::how_Contact(
-	int i,					// in:	[-]		接触溝番号．0 or 1．
+	int iGV,				// in:	[-]		接触溝番号．0 or 1．
 	const Vector2d&BL_eta,	// in:	[m]		溝直行断面におけるボールの座標．（原点：PCD螺旋中心，η-ζ座標）
 	Vector2d&e,				// out:	[-]:	溝中心から見たボール方向ベクトル．ボールの受ける接触荷重方向の逆向き．(η-ζ座標)
 	double&dx				// out:	[-]		弾性接近量．正で接触．
 ) {
 	// 溝中心点からボール中心に向かうベクトルの算出．
-	Vector2d gb = BL_eta - this->CY->SP[iSP].GV[i].eta;
+	Vector2d gb = BL_eta - this->CY->SP[iSP].GV[iGV].eta;
 	double gb_norm = gb.norm();
 
 	// 幾何学からボール食い込み量の算出．
-	dx = gb_norm - this->CY->SP[iSP].GV[i].r + this->BL->r;
+	dx = gb_norm - this->CY->SP[iSP].GV[iGV].r + this->BL->r;
 
 	// 溝中心点とボール中心が一致していたら接していないことにする．（0除算防止）
 	if (gb_norm == 0.0)
@@ -37,7 +38,7 @@ bool BS_BallCylinderPair::how_Contact(
 	e = gb / gb_norm;
 
 	// ボール中心がトーラスから出ていたら接していないことにする．
-	if (gb_norm > this->CY->SP[iSP].GV[i].r) {
+	if (gb_norm > this->CY->SP[iSP].GV[iGV].r) {
 		return false;
 	}
 
@@ -58,7 +59,7 @@ int BS_BallCylinderPair::num_Contact() {
 	double dx;
 
 	int nc = 0;
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < nGV; i++)
 		nc += int(this->how_Contact(i, eta, e, dx));
 
 	return nc;
@@ -66,7 +67,7 @@ int BS_BallCylinderPair::num_Contact() {
 
 // Hertzの計算から，荷重を返すメソッド．ダンパによる減衰なし．
 double BS_BallCylinderPair::calc_Hertz(
-	int ig,					// in:	[-]		接触溝番号．0 or 1．
+	int iGV,				// in:	[-]		接触溝番号．0 or 1．
 	const Vector2d&bl_eta,	// in:	[m]		螺旋座標系でのボール位置．
 	const Vector2d&e,		// in:	[-]:	溝中心から見たボール方向ベクトル．ボールの受ける接触荷重方向の逆向き．
 	double dx,				// in:	[-]		弾性接近量．正で接触．
@@ -83,7 +84,7 @@ double BS_BallCylinderPair::calc_Hertz(
 	cos_alp = e[0];
 	sin_alp = e[1];
 
-	rho = this->CY->SP[this->iSP].get_rho(cos_alp, ig);
+	rho = this->CY->SP[this->iSP].get_rho(cos_alp, iGV);
 
 	Rx = 1.0 / (this->BL->r_inv + rho[0]);
 	Ry = 1.0 / (this->BL->r_inv + rho[1]);
@@ -101,7 +102,7 @@ double BS_BallCylinderPair::calc_Hertz(
 
 // Hertzの計算から，荷重を返すメソッド．ダンパによる減衰あり．
 double BS_BallCylinderPair::calc_DynamicHertz(
-	int ig,					// in:	[-]		接触溝番号．0 or 1．
+	int iGV,				// in:	[-]		接触溝番号．0 or 1．
 	const Vector2d&bl_eta,	// in:	[m]		螺旋座標系でのボール位置．
 	const Vector2d&bl_etav,	// in:	[m]		螺旋座標系でのボール速度．
 	const Vector2d&e,		// in:	[-]:	溝中心から見たボール方向ベクトル．ボールの受ける接触荷重方向の逆向き．
@@ -117,10 +118,10 @@ double BS_BallCylinderPair::calc_DynamicHertz(
 ) {
 	// BrewHamrock の近似式から剛性，接触楕円を求める． 
 	double k;
-	double F_norm_ = this->calc_Hertz(ig, bl_eta, e, dx, Rx, Ry, p, cos_alp, sin_alp, a, b, k, rho);
+	double F_norm_ = this->calc_Hertz(iGV, bl_eta, e, dx, Rx, Ry, p, cos_alp, sin_alp, a, b, k, rho);
 
 	// 非線形剛性から，非線形ダンパ係数 c を算出．
-	double c = 2 * this->GV[ig].zeta * sqrt(1.5 * this->m * k);
+	double c = 2 * this->GV[iGV].zeta * sqrt(1.5 * this->m * k);
 
 	// ボールが壁面に向かっていく速度成分を算出．
 	double v = bl_etav.dot(e);
@@ -146,7 +147,7 @@ void BS_BallCylinderPair::get_F0(
 	Fbc = Vector2d::Zero();
 	Fcb = Tcb = Vector3d::Zero();
 
-	for (int ig = 0; ig < 2; ig++) {
+	for (int iGV = 0; iGV < nGV; iGV++) {
 
 		Vector3d p_, Fcb_;
 		p_ = Fcb_ = Vector3d::Zero();
@@ -157,17 +158,17 @@ void BS_BallCylinderPair::get_F0(
 		Vector2d e, Fbc_;
 		Fbc_ = Vector2d::Zero();
 
-		bool is_contact = this->how_Contact(ig, eta, e, dx);
+		bool is_contact = this->how_Contact(iGV, eta, e, dx);
 
 		if (is_contact) {
 			double Rx, Ry, cos_alp, sin_alp, b, k;
 			Vector2d p, rho;
-			F_norm = this->calc_Hertz(ig, eta, e, dx, Rx, Ry, p, cos_alp, sin_alp, a, b, k, rho);
+			F_norm = this->calc_Hertz(iGV, eta, e, dx, Rx, Ry, p, cos_alp, sin_alp, a, b, k, rho);
 			Fbc_ = -e * F_norm;
 			Fcb_ = this->CY->to_inertialvector(Vector3d(0.0, -Fbc_[0], -Fbc_[1]), xyz2eta);
 			p_ = this->CY->to_inertialcoord(iSP, Vector3d(th, p[0], p[1]));
 		}
-		this->save_F0(ig, p_, F_norm, th_eta, a, Fbc_);
+		this->save_F0(iGV, p_, F_norm, th_eta, a, Fbc_);
 		Fbc += Fbc_;
 		Fcb += Fcb_;
 		Tcb += this->CY->calc_Torque(p_, Fcb_);
@@ -175,14 +176,14 @@ void BS_BallCylinderPair::get_F0(
 	return;
 }
 
-void BS_BallCylinderPair::save_F0(int ig, const Vector3d&p, double F, const Vector3d&eta, double a, const Vector2d&Fbc) {
+void BS_BallCylinderPair::save_F0(int iGV, const Vector3d&p, double F, const Vector3d&eta, double a, const Vector2d&Fbc) {
 
 	this->SV.eta = eta;
 
-	this->SV.GV[ig].p = p;
-	this->SV.GV[ig].F = F;
-	this->SV.GV[ig].a = a;
-	this->SV.GV[ig].Fbc = Fbc;
+	this->SV.GV[iGV].p = p;
+	this->SV.GV[iGV].F = F;
+	this->SV.GV[iGV].a = a;
+	this->SV.GV[iGV].Fbc = Fbc;
 
 	return;
 }
@@ -204,7 +205,7 @@ void BS_BallCylinderPair::get_F1(
 	Fbc = Vector2d::Zero();
 	Fcb = Tcb = Vector3d::Zero();
 
-	for (int ig = 0; ig < 2; ig++) {
+	for (int iGV = 0; iGV < nGV; iGV++) {
 
 		Vector3d p_, Fcb_;
 		p_ = Fcb_ = Vector3d::Zero();
@@ -215,17 +216,17 @@ void BS_BallCylinderPair::get_F1(
 		Vector2d e_, Fbc_;
 		Fbc_ = Vector2d::Zero();
 
-		bool is_contact = this->how_Contact(ig, eta, e_, dx);
+		bool is_contact = this->how_Contact(iGV, eta, e_, dx);
 
 		if (is_contact) {
 			double Rx, Ry, cos_alp, sin_alp, b, k;
 			Vector2d p, rho;
-			F_norm = this->calc_Hertz(ig, eta, e_, dx, Rx, Ry, p, cos_alp, sin_alp, a, b, k, rho);
+			F_norm = this->calc_Hertz(iGV, eta, e_, dx, Rx, Ry, p, cos_alp, sin_alp, a, b, k, rho);
 			Fbc_ = -e_ * F_norm;
 
 			// ナット/シャフトから見た玉進行方向の向きから摩擦力の方向を決め打ちで計算
 			Vector2d muFb;
-			double mu = this->GV[ig].mu;
+			double mu = this->GV[iGV].mu;
 
 			if (direction)
 				muFb = Vector2d(-mu * Fbc_[1], mu * Fbc_[0]);
@@ -248,7 +249,7 @@ void BS_BallCylinderPair::get_F1(
 		//}
 		Fcb_ = this->CY->to_inertialvector(Vector3d(0.0, -Fbc_[0], -Fbc_[1]), xyz2eta);
 
-		this->save_F0(ig, p_, F_norm, th_eta, a, Fbc_);
+		this->save_F0(iGV, p_, F_norm, th_eta, a, Fbc_);
 		Fbc += Fbc_;
 		Fcb += Fcb_;
 		Tcb += this->CY->calc_Torque(p_, Fcb_);
@@ -263,11 +264,11 @@ void BS_BallCylinderPair::get_F2(
 ) {
 	vF = vT = Vector3d::Zero();
 
-	for (int ig = 0; ig < 2; ig++) {
+	for (int iGV = 0; iGV < nGV; iGV++) {
 
-		Vector3d p = this->SV.GV[ig].p;
+		Vector3d p = this->SV.GV[iGV].p;
 		Vector3d v = this->get_us(p);
-		double   F = this->SV.GV[ig].F;
+		double   F = this->SV.GV[iGV].F;
 		Vector3d vF_ = v * F;
 		Vector3d vT_ = this->BL->calc_Torque(p, vF_);
 		vF += vF_;
@@ -279,6 +280,7 @@ void BS_BallCylinderPair::get_F2(
 // 現在の状態から，ボールと円筒の接触荷重のみを求めるメソッド．
 void BS_BallCylinderPair::get_dyn_F0(
 	bool direction,		// in:	[-]		円筒から見たボール進行方向ベクトル(+x:false，-x:true)
+	Vector3d&etav,		// out:	[N]:	ボール(b)が円筒(c)から受ける力（慣性座標系）．
 	Vector3d&Fbc,		// out:	[N]:	ボール(b)が円筒(c)から受ける力（慣性座標系）．
 	Vector3d&Fcb,		// out:	[N]:	円筒(c)がボール(b)から受ける力（慣性座標系）．
 	Vector3d&Tcb		// out:	[Nm]:	円筒(c)がボール(b)から受けるトルク（慣性座標系）．
@@ -288,9 +290,12 @@ void BS_BallCylinderPair::get_dyn_F0(
 	Vector2d eta = Vector2d(th_eta[1], th_eta[2]);
 	Matrix3d xyz2eta = this->CY->get_xyz2eta(iSP, th);
 
+	etav = this->CY->to_etavelocity(this->BL->v, xyz2eta);
+	Vector2d etav_ = Vector2d(etav[1], etav[2]);
+
 	Fbc = Fcb = Tcb = Vector3d::Zero();
 
-	for (int ig = 0; ig < 2; ig++) {
+	for (int iGV = 0; iGV < nGV; iGV++) {
 
 		Vector3d p_, Fcb_;
 		p_ = Fcb_ = Vector3d::Zero();
@@ -301,17 +306,18 @@ void BS_BallCylinderPair::get_dyn_F0(
 		Vector2d e_, Fbc_;
 		Fbc_ = Vector2d::Zero();
 
-		bool is_contact = this->how_Contact(ig, eta, e_, dx);
+		bool is_contact = this->how_Contact(iGV, eta, e_, dx);
 
 		if (is_contact) {
 			double Rx, Ry, cos_alp, sin_alp, b, k;
 			Vector2d p, rho;
-			F_norm = this->calc_Hertz(ig, eta, e_, dx, Rx, Ry, p, cos_alp, sin_alp, a, b, k, rho);
+			F_norm = this->calc_DynamicHertz(iSP, eta, etav_, e_, dx, Rx, Ry, p, cos_alp, sin_alp, a, b, rho);
+
 			Fbc_ = -e_ * F_norm;
 
 			// ナット/シャフトから見た玉進行方向の向きから摩擦力の方向を決め打ちで計算
 			Vector2d muFb;
-			double mu = this->GV[ig].mu;
+			double mu = this->GV[iGV].mu;
 
 			if (direction)
 				muFb = Vector2d(-mu * Fbc_[1], mu * Fbc_[0]);
@@ -323,7 +329,7 @@ void BS_BallCylinderPair::get_dyn_F0(
 		}
 		Fcb_ = this->CY->to_inertialvector(Vector3d(0.0, -Fbc_[0], -Fbc_[1]), xyz2eta);
 
-		Fbc += Fbc_;
+		Fbc -= Fcb_;
 		Fcb += Fcb_;
 		Tcb += this->CY->calc_Torque(p_, Fcb_);
 	}
@@ -351,7 +357,7 @@ void BS_BallCylinderPair::get_FT(
 
 	Vector3d exai = this->CY->to_inertialvector(Vector3d::UnitX(), xyz2eta);	// 慣性座標系の溝断面進行方向
 
-	for (int ig = 0; ig < 2; ig++) {
+	for (int iGV = 0; iGV < nGV; iGV++) {
 		double dx, Rx, Ry, cos_alp, sin_alp, a, b, F_norm, Pmax, lambda, fratio, h;
 		dx = Rx = Ry = cos_alp = sin_alp = a = b = F_norm = Pmax = lambda = fratio = h = 0.0;
 		Vector2d e, p, rho;
@@ -359,7 +365,7 @@ void BS_BallCylinderPair::get_FT(
 		Vector3d p_, Fn, us, ur, Tbr, Fs_, Ts_, Fb, Tb, Ti, Tcs_;
 		p_ = Fn = us = ur = Tbr = Fs_ = Ts_ = Fb = Tb = Ti = Tcs_ = Vector3d::Zero();
 
-		bool is_contact = this->how_Contact(ig, eta, e, dx);
+		bool is_contact = this->how_Contact(iGV, eta, e, dx);
 
 		if (is_contact) {
 			F_norm = this->calc_DynamicHertz(iSP, eta, etav_, e, dx, Rx, Ry, p, cos_alp, sin_alp, a, b, rho);
@@ -376,9 +382,9 @@ void BS_BallCylinderPair::get_FT(
 			// ボールにかかる滑り摩擦抗力の算出．
 			h = this->TB.FT->calc(F_norm, this->E, Rx, Ry, this->LB.alpha, this->LB.eta, ur_norm, this->LB.lm, b);
 			h *= Tribology::ErtelGrubin(this->LB.eta, this->LB.beta, this->LB.k, ur_norm);
-			lambda = h / this->GV[ig].sigma;
+			lambda = h / this->GV[iGV].sigma;
 			fratio = Tribology::ForceRatio(lambda);
-			this->calc_Sliding(ig, th, p_, exai, a, b, Pmax, ur_norm, F_norm, fratio, rho, Fs_, Ts_, Tcs_);
+			this->calc_Sliding(iGV, th, p_, exai, a, b, Pmax, ur_norm, F_norm, fratio, rho, Fs_, Ts_, Tcs_);
 
 			// ボールにかかる転がり摩擦抗力の算出．（慣性座標系）
 			double Trr_norm = this->TB.RR->calc(Rx, Ry, this->BL->D, a, b, F_norm, this->E, ur_norm, fratio, this->LB.eta, this->LB.alpha, this->LB.beta, this->LB.k, this->LB.lm);
@@ -393,9 +399,9 @@ void BS_BallCylinderPair::get_FT(
 		}
 		else {
 			// 接触しないとき，スライス片の結果をすべて0にする
-			this->init_Sliceparam(ig);
+			this->init_Sliceparam(iGV);
 		}
-		this->save(ig, th_eta, Fn, Fs_, us, ur, dx, cos_alp, sin_alp, a, b, h, p_, lambda, fratio, Pmax);
+		this->save(iGV, th_eta, Fn, Fs_, us, ur, dx, cos_alp, sin_alp, a, b, h, p_, lambda, fratio, Pmax);
 
 		// 溝0と溝1の合計を出力する．
 		Fbc += Fb;		// Fbc : ボール(b)が円筒(c)から受ける力．
@@ -434,7 +440,7 @@ Vector3d BS_BallCylinderPair::get_eta(void) {
 // 滑り摩擦を求めるメソッド．
 void BS_BallCylinderPair::calc_Sliding
 (
-	int ig,				// in:	[-]		接触溝番号．0 or 1．
+	int iGV,				// in:	[-]		接触溝番号．0 or 1．
 	double th,			// in:	[rad]:	螺旋位相角．
 	const Vector3d&p,	// in:	[m]:	接触点位置（慣性座標系）．
 	const Vector3d&xai,	// in:	[m]:	溝断面における螺旋進行方向ベクトル．（慣性座標系）
@@ -455,16 +461,16 @@ void BS_BallCylinderPair::calc_Sliding
 	double rhoy = this->BL->r_inv - rho[0];
 	Vector2d rhom(rhox, rhoy);
 
-	this->CY->calc_slice(iSP, ig, th, p, xai, a, b, this->GV[ig].xy, this->GV[ig].n, rhom, this->GV[ig].ps);
+	this->CY->calc_slice(iSP, iGV, th, p, xai, a, b, this->GV[iGV].xy, this->GV[iGV].n, rhom, this->GV[iGV].ps);
 
 	// 接触楕円をスライスしてそれぞれの滑り摩擦力を積算する．
-	for (int j = 0; j < this->GV[ig].n; j++) {
-		Vector3d ps = this->GV[ig].ps[j];
+	for (int j = 0; j < this->GV[iGV].n; j++) {
+		Vector3d ps = this->GV[iGV].ps[j];
 		Vector3d us_ = this->get_us(ps);
 		double us_norm = us_.norm();
 		double mu_tr = this->TB.TR->calc(this->LB.eta, Pmax, us_norm, ur_norm);
-		double mu_cl = this->TB.CL->calc(this->GV[ig].mu, us_norm, ur_norm, this->TB.cs);
-		double f_arr = this->GV[ig].r[j] * F_norm;
+		double mu_cl = this->TB.CL->calc(this->GV[iGV].mu, us_norm, ur_norm, this->TB.cs);
+		double f_arr = this->GV[iGV].r[j] * F_norm;
 		double Fs_norm = mu_tr * fratio * f_arr + mu_cl * (1.0 - fratio) * f_arr;
 		Vector3d Fs_ = Fs_norm * -us_ / us_norm;
 		Vector3d Ts_ = this->BL->calc_Torque(ps, Fs_);
@@ -472,7 +478,7 @@ void BS_BallCylinderPair::calc_Sliding
 		Fs += Fs_;
 		Ts += Ts_;
 		Tcs += Tcs_;
-		this->save_Slice(ig, j, f_arr, Fs_, Ts_, mu_cl, mu_tr, us_, this->GV[ig].ps[j]);
+		this->save_Slice(iGV, j, f_arr, Fs_, Ts_, mu_cl, mu_tr, us_, this->GV[iGV].ps[j]);
 	}
 	return;
 }
@@ -504,17 +510,17 @@ void BS_BallCylinderPair::init(
 	const BS_In::Tribology & tribology,
 	const BS_In::Oil & oil
 ) {
-	for (int k = 0; k < 2; k++) {
+	for (int iGV = 0; iGV < nGV; iGV++) {
 
 		switch (tribology.ellipse) {
 		case BS_In::Tribology::Ellipse::Mesh1d: {
 			int n0 = tribology.ellipse_mesh[0];
-			this->GV[k].n = tribology.ellipse_mesh[0];
-			this->GV[k].r = new double[this->GV[k].n];
-			this->GV[k].xy = new Vector2d[this->GV[k].n];
-			Tribology::SliceForceRatio(this->GV[k].n, this->GV[k].r);
+			this->GV[iGV].n = tribology.ellipse_mesh[0];
+			this->GV[iGV].r = new double[this->GV[iGV].n];
+			this->GV[iGV].xy = new Vector2d[this->GV[iGV].n];
+			Tribology::SliceForceRatio(this->GV[iGV].n, this->GV[iGV].r);
 			for (int i = 0; i < n0; i++)
-				this->GV[k].xy[i] = Vector2d(double(2 * i - n0 + 1) / n0, 0);
+				this->GV[iGV].xy[i] = Vector2d(double(2 * i - n0 + 1) / n0, 0);
 
 			break;
 		}
@@ -523,35 +529,35 @@ void BS_BallCylinderPair::init(
 			int n1 = tribology.ellipse_mesh[1];
 			double*r_temp = new double[n0];
 			Tribology::SliceForceRatio2d(n0, n1, r_temp);
-			this->GV[k].n = n0 * n1;
-			this->GV[k].r = new double[this->GV[k].n];
-			this->GV[k].xy = new Vector2d[this->GV[k].n];
+			this->GV[iGV].n = n0 * n1;
+			this->GV[iGV].r = new double[this->GV[iGV].n];
+			this->GV[iGV].xy = new Vector2d[this->GV[iGV].n];
 			for (int i = 0; i < n0; i++) {
 				double r0 = (i + 0.5) / n0;
 				for (int j = 0; j < n1; j++) {
 					int ij = i * n1 + j;
 					double th = (j + 0.5) / n1 * 2 * Numeric::pi;
 
-					this->GV[k].r[ij] = r_temp[i];
-					this->GV[k].xy[ij] = r0 * Vector2d(cos(th), sin(th));
+					this->GV[iGV].r[ij] = r_temp[i];
+					this->GV[iGV].xy[ij] = r0 * Vector2d(cos(th), sin(th));
 				}
 			}
 			break;
 		}
 		}
-		this->GV[k].ps = new Vector3d[this->GV[k].n];
+		this->GV[iGV].ps = new Vector3d[this->GV[iGV].n];
 
-		this->GV[k].sigma = Vector2d(
+		this->GV[iGV].sigma = Vector2d(
 			this->BL->sigmap,
-			this->CY->SP[iSP].GV[k].sigma
+			this->CY->SP[iSP].GV[iGV].sigma
 		).norm();		//合成粗さ
 
-		this->GV[k].mu = BCP.groove[k].mu;
-		this->GV[k].zeta = BCP.groove[k].zeta;
+		this->GV[iGV].mu = BCP.groove[iGV].mu;
+		this->GV[iGV].zeta = BCP.groove[iGV].zeta;
 
-		this->SV.GV[k].SL = new Save::Groove::Slice[this->GV[k].n];
+		this->SV.GV[iGV].SL = new Save::Groove::Slice[this->GV[iGV].n];
 
-		this->init_Sliceparam(k);
+		this->init_Sliceparam(iGV);
 	}
 	this->m = this->BL->m; // 1.0 / (1.0 / this->BL->m  + 1.0 / this->CY->m);//換算質量
 	this->E = Tribology::ReducedYoung(this->BL->E, this->BL->nu, this->CY->E, this->CY->nu);	//等価ヤング率
@@ -594,8 +600,7 @@ Vector3d BS_BallNutPair::get_eta0(void) {
 void BS_BallNutPair::set_eta0(const Vector2d & eta) {
 
 	Vector3d eta_ = Vector3d(this->th0, eta[0], eta[1]);
-	Vector3d x = this->CY->to_inertialcoord(iSP, eta_);
-	this->BL->x = x;
+	this->BL->x = this->CY->to_inertialcoord(iSP, eta_);
 
 	return;
 }
@@ -706,7 +711,7 @@ void BS_BallCylinderPair::init_Oil(const BS_In::Oil & oil) {
 
 // 計算結果をメンバ変数に格納するメソッド．
 void BS_BallCylinderPair::save(
-	int ig,
+	int iGV,
 	const Vector3d&eta,
 	const Vector3d&Fn,
 	const Vector3d&Fs,
@@ -724,19 +729,19 @@ void BS_BallCylinderPair::save(
 	double Pmax
 ) {
 	this->SV.eta = eta;
-	this->SV.GV[ig].Fn = Fn;
-	this->SV.GV[ig].Fs = Fs;
-	this->SV.GV[ig].us = us;
-	this->SV.GV[ig].ur = ur;
-	this->SV.GV[ig].dx = dx;
-	this->SV.GV[ig].phi = atan2(sin_alp, cos_alp);
-	this->SV.GV[ig].a = a;
-	this->SV.GV[ig].b = b;
-	this->SV.GV[ig].h = h;
-	this->SV.GV[ig].p = p;
-	this->SV.GV[ig].lambda = lambda;
-	this->SV.GV[ig].fratio = fratio;
-	this->SV.GV[ig].Pmax = Pmax;
+	this->SV.GV[iGV].Fn = Fn;
+	this->SV.GV[iGV].Fs = Fs;
+	this->SV.GV[iGV].us = us;
+	this->SV.GV[iGV].ur = ur;
+	this->SV.GV[iGV].dx = dx;
+	this->SV.GV[iGV].phi = atan2(sin_alp, cos_alp);
+	this->SV.GV[iGV].a = a;
+	this->SV.GV[iGV].b = b;
+	this->SV.GV[iGV].h = h;
+	this->SV.GV[iGV].p = p;
+	this->SV.GV[iGV].lambda = lambda;
+	this->SV.GV[iGV].fratio = fratio;
+	this->SV.GV[iGV].Pmax = Pmax;
 	return;
 }
 
@@ -760,50 +765,50 @@ void BS_BallCylinderPair::save(BS_Out::BallCylinderPair & OUT) {
 
 	for (int k = 0; k < 3; k++)
 		OUT.eta[k] = this->SV.eta[k];
-	for (int j = 0; j < 2; j++) {
-		Vector3d Fn_ = this->CY->to_etavector(this->SV.GV[j].Fn, xyz2eta);
-		Vector3d Fs_ = this->CY->to_etavector(this->SV.GV[j].Fs, xyz2eta);
-		Vector3d us_ = this->CY->to_etavector(this->SV.GV[j].us, xyz2eta);
-		Vector3d ur_ = this->CY->to_etavector(this->SV.GV[j].ur, xyz2eta);
+	for (int iGV = 0; iGV < nGV; iGV++) {
+		Vector3d Fn_ = this->CY->to_etavector(this->SV.GV[iGV].Fn, xyz2eta);
+		Vector3d Fs_ = this->CY->to_etavector(this->SV.GV[iGV].Fs, xyz2eta);
+		Vector3d us_ = this->CY->to_etavector(this->SV.GV[iGV].us, xyz2eta);
+		Vector3d ur_ = this->CY->to_etavector(this->SV.GV[iGV].ur, xyz2eta);
 		for (int k = 0; k < 3; k++) {
-			OUT.GV[j].Fn[k] = Fn_[k];
-			OUT.GV[j].Fs[k] = Fs_[k];
-			OUT.GV[j].us[k] = us_[k];
-			OUT.GV[j].ur[k] = ur_[k];
+			OUT.GV[iGV].Fn[k] = Fn_[k];
+			OUT.GV[iGV].Fs[k] = Fs_[k];
+			OUT.GV[iGV].us[k] = us_[k];
+			OUT.GV[iGV].ur[k] = ur_[k];
 		}
-		OUT.GV[j].dx = this->SV.GV[j].dx;
-		OUT.GV[j].phi = this->SV.GV[j].phi;
-		OUT.GV[j].a = this->SV.GV[j].a;
-		OUT.GV[j].b = this->SV.GV[j].b;
-		OUT.GV[j].h = this->SV.GV[j].h;
-		OUT.GV[j].fratio = this->SV.GV[j].fratio;
-		OUT.GV[j].lambda = this->SV.GV[j].lambda;
-		OUT.GV[j].Pmax = this->SV.GV[j].Pmax;
-		write_slice(j, xyz2eta, OUT);
+		OUT.GV[iGV].dx = this->SV.GV[iGV].dx;
+		OUT.GV[iGV].phi = this->SV.GV[iGV].phi;
+		OUT.GV[iGV].a = this->SV.GV[iGV].a;
+		OUT.GV[iGV].b = this->SV.GV[iGV].b;
+		OUT.GV[iGV].h = this->SV.GV[iGV].h;
+		OUT.GV[iGV].fratio = this->SV.GV[iGV].fratio;
+		OUT.GV[iGV].lambda = this->SV.GV[iGV].lambda;
+		OUT.GV[iGV].Pmax = this->SV.GV[iGV].Pmax;
+		write_slice(iGV, xyz2eta, OUT);
 	}
 	return;
 }
 
 // スライス片の結果を出力用構造体に格納
 void BS_BallCylinderPair::write_slice(
-	int ig,						// in:	[-]: 溝番号
+	int iGV,						// in:	[-]: 溝番号
 	Matrix3d xyz2eta,			// in:	[-]: 溝直交座標系変換行列
 	BS_Out::BallCylinderPair&OUT	// out:    : 玉-内外輪接触計算出力
 ) {
-	for (int j = 0; j < this->GV[ig].n; j++) {
-		OUT.GV[ig].SL[j].f_arr = this->SV.GV[ig].SL[j].f_arr;
-		OUT.GV[ig].SL[j].mu_cl = this->SV.GV[ig].SL[j].mu_cl;
-		OUT.GV[ig].SL[j].mu_tr = this->SV.GV[ig].SL[j].mu_tr;
-		Vector3d fs_ = this->CY->to_etavector(this->SV.GV[ig].SL[j].fs, xyz2eta);
-		Vector3d ts_ = this->CY->to_etavector(this->SV.GV[ig].SL[j].ts, xyz2eta);
-		Vector3d us_ = this->CY->to_etavector(this->SV.GV[ig].SL[j].us, xyz2eta);
-		Vector3d p_ = this->CY->to_etavector(this->SV.GV[ig].SL[j].ps, xyz2eta);
+	for (int j = 0; j < this->GV[iGV].n; j++) {
+		OUT.GV[iGV].SL[j].f_arr = this->SV.GV[iGV].SL[j].f_arr;
+		OUT.GV[iGV].SL[j].mu_cl = this->SV.GV[iGV].SL[j].mu_cl;
+		OUT.GV[iGV].SL[j].mu_tr = this->SV.GV[iGV].SL[j].mu_tr;
+		Vector3d fs_ = this->CY->to_etavector(this->SV.GV[iGV].SL[j].fs, xyz2eta);
+		Vector3d ts_ = this->CY->to_etavector(this->SV.GV[iGV].SL[j].ts, xyz2eta);
+		Vector3d us_ = this->CY->to_etavector(this->SV.GV[iGV].SL[j].us, xyz2eta);
+		Vector3d p_ = this->CY->to_etavector(this->SV.GV[iGV].SL[j].ps, xyz2eta);
 
 		for (int k = 0; k < 3; k++) {
-			OUT.GV[ig].SL[j].fs_[k] = fs_[k];
-			OUT.GV[ig].SL[j].ts_[k] = ts_[k];
-			OUT.GV[ig].SL[j].us_[k] = us_[k];
-			OUT.GV[ig].SL[j].ps_[k] = p_[k];
+			OUT.GV[iGV].SL[j].fs_[k] = fs_[k];
+			OUT.GV[iGV].SL[j].ts_[k] = ts_[k];
+			OUT.GV[iGV].SL[j].us_[k] = us_[k];
+			OUT.GV[iGV].SL[j].ps_[k] = p_[k];
 		}
 	}
 	return;
@@ -811,7 +816,7 @@ void BS_BallCylinderPair::write_slice(
 
 
 BS_BallCylinderPair::BS_BallCylinderPair() {
-	for (int i = 0; i < 2; i++) {
+	for (int i = 0; i < nGV; i++) {
 		this->GV[i].ps = NULL;
 		this->GV[i].r = NULL;
 	}
@@ -819,7 +824,7 @@ BS_BallCylinderPair::BS_BallCylinderPair() {
 }
 
 BS_BallCylinderPair::~BS_BallCylinderPair() {
-	for (int i = 0; i < 2; i++) {
+	for (int i = 0; i < nGV; i++) {
 		if (this->GV[i].ps != NULL)
 			delete[] this->GV[i].ps;
 		if (this->GV[i].r != NULL)
@@ -834,22 +839,22 @@ BS_BallCylinderPair::~BS_BallCylinderPair() {
 //Matrix3d xyz2eta = this->CY->get_xyz2eta(is, th);
 //Vector3d xai = this->CY->to_inertialvector(Vector3d::UnitX(), xyz2eta);
 
-//for (int ig = 0; ig < 2; ig++) {
-//	Vector3d p  = this->GV[ig].p;
-//	double Fn = this->GV[ig].F;
-//	double a  = this->GV[ig].a;
+//for (int iGV = 0; iGV < 2; iGV++) {
+//	Vector3d p  = this->GV[iGV].p;
+//	double Fn = this->GV[iGV].F;
+//	double a  = this->GV[iGV].a;
 
-//	int ms = this->GV[ig].n;
+//	int ms = this->GV[iGV].n;
 //	VectorXd F_arr = Tribology::FroceSlice(Fn, ms);
 
-//	this->CY->calc_slice(is, ig, th, p, xai, a, ms, this->GV[ig].ps);
+//	this->CY->calc_slice(is, iGV, th, p, xai, a, ms, this->GV[iGV].ps);
 //	double ur = this->get_ur(p).norm();
 
 //	for (int is = 0; is < ms; is++) {
-//		Vector3d ps = this->GV[ig].ps[is];
+//		Vector3d ps = this->GV[iGV].ps[is];
 //		Vector3d us = this->get_us(ps);
 //		double us_norm =  us.norm();
-//		double mu = Tribology::CoulombsModel(this->GV[ig].mu, us_norm, ur);
+//		double mu = Tribology::CoulombsModel(this->GV[iGV].mu, us_norm, ur);
 //		Vector3d F_ = -us * F_arr[is] / us_norm * mu;
 //		Vector3d T_ = this->BL->calc_Torque(p, F_);
 
@@ -861,11 +866,11 @@ BS_BallCylinderPair::~BS_BallCylinderPair() {
 //
 //	vF = vT = Vector3d::Zero();
 //
-//	for (int ig = 0; ig < 2; ig++) {
+//	for (int iGV = 0; iGV < 2; iGV++) {
 //
-//		Vector3d p = this->GV[ig].p;
+//		Vector3d p = this->GV[iGV].p;
 //		Vector3d v = this->get_us(p);
-//		double   F = this->GV[ig].F;
+//		double   F = this->GV[iGV].F;
 //		Vector3d vF_= v * F;
 //		Vector3d vT_= this->BL->calc_Torque(p, vF_);
 //		vF += vF_;
@@ -880,23 +885,23 @@ BS_BallCylinderPair::~BS_BallCylinderPair() {
 	//Matrix3d xyz2eta = this->CY->get_xyz2eta(is, th);
 	//Vector3d xai = this->CY->to_inertialvector(Vector3d::UnitX(), xyz2eta);
 
-	//for (int ig = 0; ig < 2; ig++) {
-	//	Vector3d p  = this->GV[ig].p;
-	//	double Fn = this->GV[ig].F;
-	//	double a  = this->GV[ig].a;
+	//for (int iGV = 0; iGV < 2; iGV++) {
+	//	Vector3d p  = this->GV[iGV].p;
+	//	double Fn = this->GV[iGV].F;
+	//	double a  = this->GV[iGV].a;
 
-	//	int ms = this->GV[ig].n;
-	//	Tribology::ForceSlice(Fn, ms, this->GV[ig].fs);
+	//	int ms = this->GV[iGV].n;
+	//	Tribology::ForceSlice(Fn, ms, this->GV[iGV].fs);
 
-	//	this->CY->calc_slice(is, ig, th, p, xai, a, ms, this->GV[ig].ps);
+	//	this->CY->calc_slice(is, iGV, th, p, xai, a, ms, this->GV[iGV].ps);
 	//	double ur = this->get_ur(p).norm();
 
 	//	for (int is = 0; is < ms; is++) {
-	//		Vector3d ps = this->GV[ig].ps[is];
+	//		Vector3d ps = this->GV[iGV].ps[is];
 	//		Vector3d us = this->get_us(ps);
 	//		double us_norm =  us.norm();
-	//		double mu = this->GV[ig].mu;	// Tribology::CoulombsModel(this->GV[ig].mu, us_norm, ur);
-	//		Vector3d F_ = -us * this->GV[ig].fs[is] / us_norm * mu;
+	//		double mu = this->GV[iGV].mu;	// Tribology::CoulombsModel(this->GV[iGV].mu, us_norm, ur);
+	//		Vector3d F_ = -us * this->GV[iGV].fs[is] / us_norm * mu;
 	//		Vector3d T_ = this->BL->calc_Torque(p, F_);
 
 	//		F += F_;
@@ -908,11 +913,11 @@ BS_BallCylinderPair::~BS_BallCylinderPair() {
 //
 //	Vector3d vF(0.0, 0.0, 0.0);
 //
-//	for (int ig = 0; ig < 2; ig++) {
+//	for (int iGV = 0; iGV < 2; iGV++) {
 //
-//		Vector3d p = this->GV[ig].p;
+//		Vector3d p = this->GV[iGV].p;
 //		Vector3d v = this->CY->surface_velocity(p);
-//		double   F = this->GV[ig].F;
+//		double   F = this->GV[iGV].F;
 //
 //		vF += v * F;
 //	}

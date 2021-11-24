@@ -502,7 +502,7 @@ void BS_BallScrew::get_F2(double * f2) {
 }
 
 
-void BS_BallScrew::init_dyn0(double * y0) {
+void BS_BallScrew::init_dyn0(void) {
 
 	this->ST.init_dyn0();
 
@@ -510,6 +510,16 @@ void BS_BallScrew::init_dyn0(double * y0) {
 		this->BNP[ib].mem_BLv = this->BNP[ib].BL->v;
 		this->BNP[ib].BL->v.setZero();
 	}
+	return;
+}
+
+void BS_BallScrew::deinit_dyn0(void) {
+
+	for (int ib = 0; ib < this->nP; ib++)
+		this->BNP[ib].BL->v = this->BNP[ib].mem_BLv;
+
+	this->ST.deinit_dyn0();
+
 	return;
 }
 
@@ -523,7 +533,8 @@ void BS_BallScrew::get_dyn_y0(double * y0) {
 		y0[i5 + 11] = eta[1] / Rigid::l;
 		y0[i5 + 12] = eta[2] / Rigid::l;
 		for (int j = 0; j < 3; j++)
-			y0[i5 + 13 + j] = this->BNP[ib].BL->v[j] / Rigid::l * Rigid::t;
+			y0[i5 + 13 + j] = this->BNP[ib].BL->v[j]
+			/ Rigid::l * Rigid::t;
 	}
 	return;
 }
@@ -541,8 +552,8 @@ void BS_BallScrew::set_dyn_y0(const double*y0) {
 		);
 		this->BNP[ib].set_eta0(eta);
 		this->BNP[ib].BL->v =
-			Vector3d(y0[i5 + 13], y0[i5 + 14], y0[i5 + 15]) *
-			Rigid::l / Rigid::t;
+			Vector3d(y0[i5 + 13], y0[i5 + 14], y0[i5 + 15])
+			* Rigid::l / Rigid::t;
 	}
 	return;
 }
@@ -559,16 +570,13 @@ void BS_BallScrew::get_dyn_dydt0(double*dydt) {
 
 		int i5 = ib * 5;
 
-		Vector2d Fbn, Fbs;
-		Vector3d Fnb, Fsb, Tnb, Tsb;
-		this->BNP[ib].get_F1(!is_RightHand, Fbn, Fnb, Tnb);
-		this->BSP[ib].get_F1(is_RightHand, Fbs, Fsb, Tsb);
-		Vector2d Fb = Fbn + Fbs;
+		Vector3d etavn, etavs, Fbn, Fbs, Fnb, Fsb, Tnb, Tsb;
+		this->BNP[ib].get_dyn_F0(!is_RightHand, etavn, Fbn, Fnb, Tnb);
+		this->BSP[ib].get_dyn_F0(is_RightHand, etavs, Fbs, Fsb, Tsb);
+		Vector3d Fb = Fbn + Fbs;
 
-		Vector3d etav = this->BNP[ib].get_etav0();
-		
 		for (int j = 0; j < 2; j++)
-			dydt[i5 + 11 + j] = etav[j];
+			dydt[i5 + 11 + j] = etavn[j + 1];
 
 		for (int j = 0; j < 3; j++)
 			dydt[i5 + 13 + j] = Fb[j] * this->BNP[ib].BL->m_inv;
@@ -576,13 +584,14 @@ void BS_BallScrew::get_dyn_dydt0(double*dydt) {
 		Fst += Fsb;
 		Tst += Tsb;
 	}
-	Vector3d Ts_ = Ts / Rigid::l;
 
-	F1[0] = Fs[0];
-	F1[1] = Fs[1];
-	F1[2] = Fs[2];
-	F1[3] = Ts_[1];
-	F1[4] = Ts_[2];
+	for (int i = 0; i < 3; i++) {
+		dydt[i + 0] = this->ST.v[i];
+		dydt[i + 3] = Fst[i] * this->ST.m_inv;
+		dydt[i + 8] = Tst[i] * this->ST.I_inv[i];
+	}
+	for (int i = 0; i < 2; i++)
+		dydt[i + 6] = this->ST.w[i + 1];
 
 	return;
 }
