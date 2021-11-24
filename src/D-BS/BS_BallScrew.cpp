@@ -123,7 +123,7 @@ void BS_BallScrew::init(const BS_In&IN, double v0, double w0, double wn) {
 		this->CC[i].init(IN.circuit[i]);
 
 	this->NT->init(IN.nut, wn);
-	this->ST.init(IN.shaft, IN.bound.v_const, IN.bound.w_const, IN.bound.tan_thy, IN.bound.tan_thz ,v0, w0);
+	this->ST.init(IN.shaft, IN.bound.v_const, IN.bound.w_const, IN.bound.tan_thy, IN.bound.tan_thz, v0, w0);
 
 	for (int i = 0; i < this->nP; i++) {
 		this->BNP[i].init(IN.BallNutPair[i], IN.tribology, IN.oil);
@@ -151,11 +151,11 @@ void BS_BallScrew::init(const BS_In&IN, double v0, double w0, double wn) {
 }
 
 // 【初期値計算】シャフト，ボールの初期位置をざっくり決めるメソッド．
-void BS_BallScrew::preset_y0(double dx0, double dth0) {
+void BS_BallScrew::preset_y0(double dx0, double dth0, double dx1) {
 
 	this->preset_y0_F(dx0);
 	this->preset_y0_T(dth0);
-	this->preset_y0_x(1e-9);
+	this->preset_y0_x(dx1);
 
 	return;
 }
@@ -346,6 +346,7 @@ void BS_BallScrew::get_y0(double*y0) {
 	}
 	return;
 }
+
 // step0（剛性計算）：変数y0を入力
 void BS_BallScrew::set_y0(
 	const double*y0,	// in :[-]		: 変数y0
@@ -395,37 +396,6 @@ void BS_BallScrew::get_F0(double*F0) {
 		Ts += Tsb;
 	}
 	Vector3d Ts_ = Ts / Rigid::l;
-	/*
-	// 拘束条件の定義．静解析では必ず慣性座標系で拘束
-	Fs = (this->ST.x_const == true).select(Vector3d::Zero(), Fs);
-	Ts_ = (this->ST.Rx_const == true).select(Vector3d::Zero(), Ts_);
-
-	for (int i = 0; i < 3; i++) {
-		F0[i] = Fs[i];
-	}
-	F0[3] = Ts_[1];
-	F0[4] = Ts_[2];
-	*/
-	if (this->ST.x_const.y()) {
-		F0[0] = 0.0;
-		F0[1] = 0.0;
-		F0[2] = 0.0;
-	}
-	else {
-		F0[0] = Fs[0];
-		F0[1] = Fs[1];
-		F0[2] = Fs[2];
-	}
-	if (this->ST.Rx_const.y()) {
-		F0[3] = 0.0;
-		F0[4] = 0.0;
-	}
-	else {
-		F0[3] = Ts_[1];
-		F0[4] = Ts_[2];
-	}
-
-
 
 	return;
 }
@@ -445,104 +415,179 @@ void BS_BallScrew::get_F1(double*F1) {
 		this->BNP[ib].get_F1(!is_RightHand, Fbn, Fnb, Tnb);
 		this->BSP[ib].get_F1(is_RightHand, Fbs, Fsb, Tsb);
 		Vector2d Fb = Fbn + Fbs;
-		double Fbn_ = Fbn.norm();
-		double Fbs_ = Fbs.norm();
+		//double Fbn_ = Fbn.norm();
+		//double Fbs_ = Fbs.norm();
 
-		double sin_th = (Fbn[1] * Fbs[0] - Fbn[0] * Fbs[1]) / (Fbn_ * Fbs_);
+		//double sin_th = (Fbn[1] * Fbs[0] - Fbn[0] * Fbs[1]) / (Fbn_ * Fbs_);
 
 		int i2 = ib * 2;
-		F1[i2 + 5] = Fbn_ - Fbs_;
-		F1[i2 + 6] = sin_th;
+		F1[i2 + 5] = Fb[0]; // Fbn_ - Fbs_;
+		F1[i2 + 6] = Fb[1]; // sin_th * sqrt(Fbn_ * Fbs_);
 
 		Fs += Fsb;
 		Ts += Tsb;
 	}
 	Vector3d Ts_ = Ts / Rigid::l;
-	/*
-	// 拘束条件の定義．静解析では必ず慣性座標系で拘束
-	Fs = (this->ST.x_const == true).select(Vector3d::Zero(), Fs);
-	Ts_ = (this->ST.Rx_const == true).select(Vector3d::Zero(), Ts_);
-	for (int i = 0; i < 3; i++) {
-		F1[i] = Fs[i];
-	}
+
+	F1[0] = Fs[0];
+	F1[1] = Fs[1];
+	F1[2] = Fs[2];
 	F1[3] = Ts_[1];
 	F1[4] = Ts_[2];
-	*/
 
-
-	if (this->ST.x_const.y()) {
-		F1[0] = 0.0;
-		F1[1] = 0.0;
-		F1[2] = 0.0;
-	}
-	else {
-		F1[0] = Fs[0];
-		F1[1] = Fs[1];
-		F1[2] = Fs[2];
-	}
-	if (this->ST.Rx_const.y()) {
-		F1[3] = 0.0;
-		F1[4] = 0.0;
-	}
-	else {
-		F1[3] = Ts_[1];
-		F1[4] = Ts_[2];
-	}
 	return;
 }
 
-void BS_BallScrew::set_i2(int i2) {
-	this->i2 = i2;
-	return;
+// 各転動体の純転がり速度を求めるメソッド．
+void BS_BallScrew::pure_Rolling(void) {
+
+	// 全ての転動体を純転がり状態に設定する．
+	for (int i = 0; i < this->nP; i++) {
+
+		// 各溝での接触点数を求める．
+		int nn = this->BNP[i].num_Contact();
+		int ns = this->BSP[i].num_Contact();
+		std::cout << i << std::endl;
+		std::cout << nn << std::endl;
+		std::cout << ns << std::endl << std::endl;
+	}
 }
 
 void BS_BallScrew::get_y2(double * y2) {
 
-	int i = this->i2;
+	for (int ib = 0; ib < this->nP; ib++) {
 
-	Vector3d v = this->BNP[i].BL->v / Rigid::t * Rigid::l;
-	Vector3d w = this->BNP[i].BL->w / Rigid::t;
+		Vector3d v = this->BNP[ib].BL->v / Rigid::t * Rigid::l;
+		Vector3d w = this->BNP[ib].BL->w / Rigid::t;
 
-	for (int j = 0; j < 3; j++) {
-		y2[j + 0] = v[j];
-		y2[j + 3] = w[j];
+		for (int j = 0; j < 3; j++) {
+			y2[j + 0] = v[j];
+			y2[j + 3] = w[j];
+		}
 	}
 	return;
 }
 
 void BS_BallScrew::set_y2(const double * y2) {
 
-	int i = this->i2;
+	for (int ib = 0; ib < this->nP; ib++) {
 
-	Vector3d v(y2[0], y2[1], y2[2]);
-	Vector3d w(y2[3], y2[4], y2[5]);
-	this->BNP[i].BL->v = v * Rigid::t / Rigid::l;
-	this->BNP[i].BL->w = w * Rigid::t;
-
+		Vector3d v(y2[0], y2[1], y2[2]);
+		Vector3d w(y2[3], y2[4], y2[5]);
+		this->BNP[ib].BL->v = v * Rigid::t / Rigid::l;
+		this->BNP[ib].BL->w = w * Rigid::t;
+	}
 	return;
 }
 
 void BS_BallScrew::get_F2(double * f2) {
 
-	int i = this->i2;
+	for (int ib = 0; ib < this->nP; ib++) {
 
-	Vector3d vFn, vTn;
-	this->BNP[i].get_F2(vFn, vTn);
+		Vector3d vFn, vTn;
+		this->BNP[ib].get_F2(vFn, vTn);
 
-	Vector3d vFs, vTs;
-	this->BSP[i].get_F2(vFs, vTs);
+		Vector3d vFs, vTs;
+		this->BSP[ib].get_F2(vFs, vTs);
 
-	Vector3d vF = vFn + vFs;
-	Vector3d vT = vTn + vTs;
+		Vector3d vF = vFn + vFs;
+		Vector3d vT = vTn + vTs;
 
-	for (int j = 0; j < 3; j++) {
-		f2[j + 0] = vF[j];
-		f2[j + 3] = vT[j];
+		for (int j = 0; j < 3; j++) {
+			f2[j + 0] = vF[j];
+			f2[j + 3] = vT[j];
+		}
 	}
 	return;
 }
 
-void BS_BallScrew::set_y(const double*y) {
+
+void BS_BallScrew::init_dyn0(double * y0) {
+
+	this->ST.init_dyn0();
+
+	for (int ib = 0; ib < this->nP; ib++) {
+		this->BNP[ib].mem_BLv = this->BNP[ib].BL->v;
+		this->BNP[ib].BL->v.setZero();
+	}
+	return;
+}
+
+void BS_BallScrew::get_dyn_y0(double * y0) {
+
+	this->ST.get_dyn_y0(y0);
+
+	for (int ib = 0; ib < this->nP; ib++) {
+		int i5 = ib * 5;
+		Vector3d eta = this->BNP[ib].get_eta0();
+		y0[i5 + 11] = eta[1] / Rigid::l;
+		y0[i5 + 12] = eta[2] / Rigid::l;
+		for (int j = 0; j < 3; j++)
+			y0[i5 + 13 + j] = this->BNP[ib].BL->v[j] / Rigid::l * Rigid::t;
+	}
+	return;
+}
+
+// step0（剛性計算）：変数y0を入力
+void BS_BallScrew::set_dyn_y0(const double*y0) {
+
+	this->ST.set_dyn_y0(y0);
+
+	for (int ib = 0; ib < this->nP; ib++) {
+		int i5 = ib * 5;
+		Vector2d eta = Vector2d(
+			y0[i5 + 11] * Rigid::l,
+			y0[i5 + 12] * Rigid::l
+		);
+		this->BNP[ib].set_eta0(eta);
+		this->BNP[ib].BL->v =
+			Vector3d(y0[i5 + 13], y0[i5 + 14], y0[i5 + 15]) *
+			Rigid::l / Rigid::t;
+	}
+	return;
+}
+
+// 荷重を配列にして返すメソッド．
+void BS_BallScrew::get_dyn_dydt0(double*dydt) {
+
+	Vector3d Fst = this->LD.F;
+	Vector3d Tst = this->LD.T;
+
+	bool is_RightHand = (this->NT->w.x() - this->ST.w.x()) > 0;	// シャフトから見て玉が反時計回りに公転しているときtrue
+
+	for (int ib = 0; ib < this->nP; ib++) {
+
+		int i5 = ib * 5;
+
+		Vector2d Fbn, Fbs;
+		Vector3d Fnb, Fsb, Tnb, Tsb;
+		this->BNP[ib].get_F1(!is_RightHand, Fbn, Fnb, Tnb);
+		this->BSP[ib].get_F1(is_RightHand, Fbs, Fsb, Tsb);
+		Vector2d Fb = Fbn + Fbs;
+
+		Vector3d etav = this->BNP[ib].get_etav0();
+		
+		for (int j = 0; j < 2; j++)
+			dydt[i5 + 11 + j] = etav[j];
+
+		for (int j = 0; j < 3; j++)
+			dydt[i5 + 13 + j] = Fb[j] * this->BNP[ib].BL->m_inv;
+
+		Fst += Fsb;
+		Tst += Tsb;
+	}
+	Vector3d Ts_ = Ts / Rigid::l;
+
+	F1[0] = Fs[0];
+	F1[1] = Fs[1];
+	F1[2] = Fs[2];
+	F1[3] = Ts_[1];
+	F1[4] = Ts_[2];
+
+	return;
+}
+
+void BS_BallScrew::set_dyn_y1(const double*y) {
 
 	Vector3d x, v, w; Quaterniond q;
 	x.x() = y[0];
@@ -595,7 +640,7 @@ void BS_BallScrew::set_y(const double*y) {
 	return;
 }
 
-void BS_BallScrew::get_y(double*y) {
+void BS_BallScrew::get_dyn_y1(double*y) {
 
 	Vector3d x, v, w; Quaterniond q;
 	this->NT->get_y(x, v, q, w);
@@ -648,7 +693,7 @@ void BS_BallScrew::get_y(double*y) {
 	return;
 }
 
-void BS_BallScrew::get_dydt(
+void BS_BallScrew::get_dyn_dydt1(
 	double*dydt,	// out:	微分配列
 	double dvdt,	// in:	
 	double dwdt 	// in:	
@@ -740,12 +785,12 @@ void BS_BallScrew::save(BS_Out&OUT) {
 
 	for (int i = 0; i < this->NT->nCY; i++)
 		this->NT->CY[i].save(OUT.NT_CY[i]);
-		
+
 	this->ST.save(OUT.ST.x, OUT.ST.v, OUT.ST.q, OUT.ST.w, OUT.ST.ax, OUT.ST.F, OUT.ST.T);
 
 	for (int i = 0; i < this->ST.nCY; i++)
 		this->ST.CY[i].save(OUT.ST_CY[i]);
-	   
+
 	for (int i = 0; i < this->nP; i++)
 		this->BNP[i].save(OUT.BNP[i]);
 

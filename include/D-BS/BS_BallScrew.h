@@ -24,14 +24,6 @@ private:
 	BS_BallShaftPair*BSP;	// 玉-シャフト間接触
 	BallBallPair*BBP;		// 玉-玉間接触（未実装）
 
-	int i2;				// Step2で計算対象とする玉番号
-
-
-
-
-
-
-	// 外部荷重
 public:
 	struct Load {
 		EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -45,7 +37,8 @@ public:
 	void init_position(double wn, double ws);
 	void init_Load(const BS_In & IN);
 	void init(const BS_In & IN, double v0, double w0, double wn);
-	void preset_y0(double dx0, double dth0);
+	void preset_y0(double dx0, double dth0, double dx1);
+	void pure_Rolling(void);
 	void lock_y0(const double * x0, const double * ax0, double v0, double w0);
 	void preset_y0_F(double dx0);
 	void preset_y0_T(double dth0);
@@ -56,15 +49,18 @@ public:
 
 	void get_F1(double*f1);
 
-	void set_i2(int i2);
 	void get_y2(double*y0);
 	void set_y2(const double*y0);
 	void get_F2(double*f2);
 
+	void set_dyn_y0(const double * y0);
+	void init_dyn0(double * y0);
+	void get_dyn_y0(double * y0);
+	void get_dyn_dydt0(double * y);
 
-	void set_y(const double * y);
-	void get_y(double * y);
-	void get_dydt(double * dydt, double v, double w);
+	void set_dyn_y1(const double * y);
+	void get_dyn_y1(double * y);
+	void get_dyn_dydt1(double * dydt, double v, double w);
 	//void Shaft_Lock(void);
 	void save(BS_Out&OUT);
 	void set_load(double *F, double *T);

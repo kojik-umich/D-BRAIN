@@ -125,6 +125,11 @@ double Tribology::CoulombNothing::calc(double mu0, double us, double ur, double 
 	return 0.0;
 }
 
+
+double Tribology::SimpleCoulomb::calc(double mu0, double us, double ur, double s) {
+	return mu0;
+}
+
 // Brew Hamrock の近似計算．教科書の値との一致を確認．
 void Tribology::BrewHamrock::calc
 (

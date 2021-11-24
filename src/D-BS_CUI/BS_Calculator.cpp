@@ -24,6 +24,8 @@ BS_BallScrew BS_Calculator::BS = BS_BallScrew();
 BS_Calculator::Stt BS_Calculator::stt;
 BS_Calculator::Dyn BS_Calculator::dyn;
 
+const int shaft_DOF = 5;
+
 // 静解析の設定初期化．
 void BS_Calculator::init_stt(const BS_FileIn::Static&stt, int ballnum) {
 
@@ -50,9 +52,9 @@ void BS_Calculator::init_stt(const BS_FileIn::Static&stt, int ballnum) {
 		BS_Calculator::stt.set[i].jac_eps = stt.set[i].jac_eps;
 	}
 	// 入力配列サイズ．
-	BS_Calculator::stt.set[0].n = ballnum * 2 + 5;
-	BS_Calculator::stt.set[1].n = ballnum * 2 + 5;
-	BS_Calculator::stt.set[2].n = 6;
+	BS_Calculator::stt.set[0].n = ballnum * 2 + shaft_DOF;
+	BS_Calculator::stt.set[1].n = ballnum * 2 + shaft_DOF;
+	BS_Calculator::stt.set[2].n = ballnum * 6 + shaft_DOF;
 
 	// 出力配列サイズ．= 入力サイズ
 	for (int i = 0; i < 3; i++)
@@ -63,6 +65,110 @@ void BS_Calculator::init_stt(const BS_FileIn::Static&stt, int ballnum) {
 	BS_Calculator::stt.wn = stt.wn;
 
 	return;
+}
+
+// MKL "dtrnlsp_solve" を使った静解析ソルバ．使い方はマニュアル参照．（変数のアサインをマニュアルと統一させています．）
+int BS_Calculator::Stt_solve
+(
+	int i,			// in:		[-]:	静解析のstep番号．Stt_Eq*が各iに対応．
+	double*x		// inout:	[-]:	解きたい関数の引数．
+) {
+	// ソルバの初期化．
+	_TRNSP_HANDLE_t handle;
+
+	// ここは後で設定に反映．
+	double*x_lw = new double[BS_Calculator::stt.set[i].n];
+	double*x_up = new double[BS_Calculator::stt.set[i].n];
+
+	for (int j = 0; j < BS_Calculator::stt.set[i].n; j++) {
+		x_lw[j] = -1e-4;
+		x_up[j] = 1e-4;
+	}
+
+	//// ちょっと試す
+	////double*f0 = new double[BS_Calculator::stt.set[i].n];
+	//double*x0 = new double[BS_Calculator::stt.set[i].n];
+	//double*dx0 = new double[BS_Calculator::stt.set[i].n];
+
+	//for (int j = 0; j < BS_Calculator::stt.set[i].n; j++) {
+	//	//f0[j] = 0.0;
+	//	x0[j] = 0.0;
+	//	dx0[j] = 0.0;
+	//}
+
+	dtrnlspbc_init(&handle, &stt.set[i].n, &stt.set[i].m, x, x_lw, x_up, stt.set[i].eps, &stt.set[i].iter1, &stt.set[i].iter2, &stt.set[i].rs);
+
+	// 収束計算のループ．関数値およびヤコビアン配列の動的確保．
+	double *fvec = new double[stt.set[i].m];
+	double *fjac = new double[stt.set[i].m * stt.set[i].n];
+	int RCI_Request = 0;
+
+	while (true) {
+
+		dtrnlspbc_solve(&handle, fvec, fjac, &RCI_Request);
+
+		//for (int j = 0; j < BS_Calculator::stt.set[i].n; j++) {
+		//	double G = x[j] - x0[j];
+		//	dx0[j] = 0.5 * dx0[j] + 0.3 * G;
+		//	x[j] = x0[j] + dx0[j];
+		//	x0[j] = x[j];
+		//}
+
+		if (RCI_Request == -1) {
+			printf("最大繰り返し数 %d を超過しました．収束に失敗したためプログラムを終了します．\n", stt.set[0].iter1);
+			break;
+		}
+		else if (RCI_Request == -2) {
+			printf("修正量が %e [μm] を下回りました．収束に失敗したためプログラムを終了します．\n", stt.set[i].eps[0]);
+			break;
+		}
+		else if (RCI_Request == -3) {
+			printf("部材の力の釣り合いが基準値 %e [N] を下回りました．計算は収束しました．\n", sqrt(stt.set[i].eps[1]));
+			break;
+		}
+		else if (RCI_Request == -4) {
+			printf("ヤコビアンの行列式が %e [N] を下回りました．収束に失敗したためプログラムを終了します．\n", sqrt(stt.set[i].eps[2]));
+			break;
+		}
+		else if (RCI_Request == -5) {
+			printf("探索域が %e [μm] を下回りました．収束に失敗したためプログラムを終了します．\n", sqrt(stt.set[i].eps[3]));
+			break;
+		}
+		else if (RCI_Request == -6) {
+			printf("1ステップの変化量が %e [N] を下回りました．収束に失敗したためプログラムを終了します．\n", sqrt(stt.set[i].eps[4]));
+			break;
+		}
+		else if (RCI_Request == 1) {
+			if (i == 0) {
+				Stt_Eq0(&stt.set[i].m, &stt.set[i].n, x, fvec);
+			}
+			else if (i == 1) {
+				Stt_Eq1(&stt.set[i].m, &stt.set[i].n, x, fvec);
+			}
+			else if (i == 2) {
+				Stt_Eq2(&stt.set[i].m, &stt.set[i].n, x, fvec);
+			}
+		}
+		else if (RCI_Request == 2) {
+			if (i == 0) {
+				djacobi(Stt_Eq0, &stt.set[i].n, &stt.set[i].m, fjac, x, &stt.set[i].jac_eps);
+			}
+			else if (i == 1) {
+				djacobi(Stt_Eq1, &stt.set[i].n, &stt.set[i].m, fjac, x, &stt.set[i].jac_eps);
+			}
+			else if (i == 2) {
+				djacobi(Stt_Eq2, &stt.set[i].n, &stt.set[i].m, fjac, x, &stt.set[i].jac_eps);
+			}
+		}
+	}
+	// ソルバのシャットダウン．
+	dtrnlspbc_delete(&handle);
+
+	// 配列の開放．
+	delete[] fvec, fjac;
+	MKL_Free_Buffers();
+
+	return RCI_Request;
 }
 
 // 静解析のSTEP0，剛性計算．変位を入力，荷重を出力に見立ててボールねじをブラックボックスとして扱う．
@@ -77,64 +183,6 @@ void BS_Calculator::Stt_Eq0(
 	return;
 }
 
-// MKL "dtrnlsp_solve" を使った静解析ソルバ．使い方はマニュアル参照．（変数のアサインをマニュアルと統一させています．）
-int BS_Calculator::Stt_solve0
-(
-	double*x			// inout:	[-]:	解きたい関数の引数．
-) {
-	// ソルバの初期化．
-	_TRNSP_HANDLE_t handle;
-	dtrnlsp_init(&handle, &stt.set[0].n, &stt.set[0].m, x, stt.set[0].eps, &stt.set[0].iter1, &stt.set[0].iter2, &stt.set[0].rs);
-
-	// 収束計算のループ．関数値およびヤコビアン配列の動的確保．
-	double *fvec = new double[stt.set[0].m];
-	double *fjac = new double[stt.set[0].m * stt.set[0].n];
-	int RCI_Request = 0;
-
-	while (true) {
-		dtrnlsp_solve(&handle, fvec, fjac, &RCI_Request);
-
-		if (RCI_Request == -1) {
-			printf("最大繰り返し数 %d を超過しました．収束に失敗したためプログラムを終了します．\n", stt.set[0].iter1);
-			break;
-		}
-		if (RCI_Request == -2) {
-			printf("修正量が %e [μm] を下回りました．収束に失敗したためプログラムを終了します．\n", stt.set[0].eps[0]);
-			break;
-		}
-		if (RCI_Request == -3) {
-			printf("部材の力の釣り合いが基準値 %e [N] を下回りました．計算は収束しました．\n", sqrt(stt.set[0].eps[1]));
-			break;
-		}
-		if (RCI_Request == -4) {
-			printf("ヤコビアンの行列式が %e [N] を下回りました．収束に失敗したためプログラムを終了します．\n", sqrt(stt.set[0].eps[2]));
-			break;
-		}
-		if (RCI_Request == -5) {
-			printf("探索域が %e [μm] を下回りました．収束に失敗したためプログラムを終了します．\n", sqrt(stt.set[0].eps[3]));
-			break;
-		}
-		if (RCI_Request == -6) {
-			printf("1ステップの変化量が %e [N] を下回りました．収束に失敗したためプログラムを終了します．\n", sqrt(stt.set[0].eps[4]));
-			break;
-		}
-		if (RCI_Request == 1)
-			Stt_Eq0(&stt.set[0].m, &stt.set[0].n, x, fvec);
-
-		if (RCI_Request == 2)
-			djacobi(Stt_Eq0, &stt.set[0].n, &stt.set[0].m, fjac, x, &stt.set[0].jac_eps);
-	}
-
-	// ソルバのシャットダウン．
-	dtrnlsp_delete(&handle);
-
-	// 配列の開放．
-	delete[] fvec, fjac;
-	MKL_Free_Buffers();
-
-	return RCI_Request;
-}
-
 // 静解析のSTEP1，滑り計算．各玉ごとに，純転がりする値を求める．
 void BS_Calculator::Stt_Eq1(
 	int    *m, 		// in:	[-]:	出力配列サイズ．
@@ -144,67 +192,11 @@ void BS_Calculator::Stt_Eq1(
 ) {
 	BS_Calculator::BS.set_y0(x, stt.v0, stt.w0);
 	BS_Calculator::BS.get_F1(f);
+	std::cout << "x[0],\t" << x[0] << ",\t f[0],\t" << f[0] << ",\t x[50],\t" << x[50] << ",\t f[50],\t" << f[50] << std::endl;
 	return;
 }
 
-// MKL "dtrnlsp_solve" を使った静解析ソルバ．使い方はマニュアル参照．（変数のアサインをマニュアルと統一させています．）
-int BS_Calculator::Stt_solve1
-(
-	double*x			// inout:	[-]:	解きたい関数の引数．
-) {
-	// ソルバの初期化．
-	_TRNSP_HANDLE_t handle;
-	dtrnlsp_init(&handle, &stt.set[1].n, &stt.set[1].m, x, stt.set[1].eps, &stt.set[1].iter1, &stt.set[1].iter2, &stt.set[1].rs);
-
-	// 収束計算のループ．関数値およびヤコビアン配列の動的確保．
-	double *fvec = new double[stt.set[1].m];
-	double *fjac = new double[stt.set[1].m * stt.set[1].n];
-	int RCI_Request = 0;
-
-	while (true) {
-		dtrnlsp_solve(&handle, fvec, fjac, &RCI_Request);
-
-		if (RCI_Request == -1) {
-			printf("最大繰り返し数 %d を超過しました．収束に失敗したためプログラムを終了します．\n", stt.set[1].iter1);
-			break;
-		}
-		if (RCI_Request == -2) {
-			printf("修正量が %e [m/s] を下回りました．収束に失敗したためプログラムを終了します．\n", stt.set[1].eps[0] * Rigid::l / Rigid::t);
-			break;
-		}
-		if (RCI_Request == -3) {
-			printf("部材の力の釣り合いの平均が基準値 %f ％ を下回りました．計算は収束しました．\n", 100 * sqrt(stt.set[1].eps[1]) / (stt.set[1].m));
-			break;
-		}
-		if (RCI_Request == -4) {
-			printf("ヤコビアンの行列式が %e [N] を下回りました．収束に失敗したためプログラムを終了します．\n", sqrt(stt.set[1].eps[2]));
-			break;
-		}
-		if (RCI_Request == -5) {
-			printf("探索域が %e [m/s] を下回りました．収束に失敗したためプログラムを終了します．\n", sqrt(stt.set[1].eps[3])* Rigid::l / Rigid::t);
-			break;
-		}
-		if (RCI_Request == -6) {
-			printf("1ステップの変化量が %e [N] を下回りました．収束に失敗したためプログラムを終了します．\n", sqrt(stt.set[1].eps[4]));
-			break;
-		}
-		if (RCI_Request == 1)
-			Stt_Eq1(&stt.set[1].m, &stt.set[1].n, x, fvec);
-
-		if (RCI_Request == 2)
-			djacobi(Stt_Eq1, &stt.set[1].n, &stt.set[1].m, fjac, x, &stt.set[1].jac_eps);
-	}
-
-	// ソルバのシャットダウン．
-	dtrnlsp_delete(&handle);
-
-	// 配列の開放．
-	delete[] fvec, fjac;
-	MKL_Free_Buffers();
-
-	return RCI_Request;
-}
-
+//
 // 静解析のSTEP2，自公転釣り合い計算．
 void BS_Calculator::Stt_Eq2(
 	int    *m, 		// in:	[-]:	出力配列サイズ．
@@ -217,82 +209,31 @@ void BS_Calculator::Stt_Eq2(
 	return;
 }
 
-// MKL "dtrnlsp_solve" を使った静解析ソルバ．使い方はマニュアル参照．（変数のアサインをマニュアルと統一させています．）
-int BS_Calculator::Stt_solve2
-(
-	double*x			// inout:	[-]:	解きたい関数の引数．
-) {
-	// ソルバの初期化．
-	_TRNSP_HANDLE_t handle;
-	dtrnlsp_init(&handle, &stt.set[2].n, &stt.set[2].m, x, stt.set[2].eps, &stt.set[2].iter1, &stt.set[2].iter2, &stt.set[2].rs);
-
-	// 収束計算のループ．関数値およびヤコビアン配列の動的確保．
-	double *fvec = new double[stt.set[2].m];
-	double *fjac = new double[stt.set[2].m * stt.set[2].n];
-	int RCI_Request = 0;
-
-	while (true) {
-		dtrnlsp_solve(&handle, fvec, fjac, &RCI_Request);
-
-		if (RCI_Request == -1) {
-			printf("最大繰り返し数 %d を超過しました．収束に失敗したためプログラムを終了します．\n", stt.set[2].iter1);
-			break;
-		}
-		if (RCI_Request == -2) {
-			printf("修正量が %e [m/s] を下回りました．収束に失敗したためプログラムを終了します．\n", stt.set[2].eps[0] * Rigid::l / Rigid::t);
-			break;
-		}
-		if (RCI_Request == -3) {
-			printf("部材の力の釣り合いが基準値 %e [N] を下回りました．計算は収束しました．\n", sqrt(stt.set[2].eps[1]));
-			break;
-		}
-		if (RCI_Request == -4) {
-			printf("ヤコビアンの行列式が %e [N] を下回りました．収束に失敗したためプログラムを終了します．\n", sqrt(stt.set[2].eps[2]));
-			break;
-		}
-		if (RCI_Request == -5) {
-			printf("探索域が %e [m/s] を下回りました．収束に失敗したためプログラムを終了します．\n", sqrt(stt.set[2].eps[3])* Rigid::l / Rigid::t);
-			break;
-		}
-		if (RCI_Request == -6) {
-			printf("1ステップの変化量が %e [N] を下回りました．収束に失敗したためプログラムを終了します．\n", sqrt(stt.set[2].eps[4]));
-			break;
-		}
-		if (RCI_Request == 1)
-			Stt_Eq2(&stt.set[2].m, &stt.set[2].n, x, fvec);
-
-		if (RCI_Request == 2)
-			djacobi(Stt_Eq2, &stt.set[2].n, &stt.set[2].m, fjac, x, &stt.set[2].jac_eps);
-	}
-
-	// ソルバのシャットダウン．
-	dtrnlsp_delete(&handle);
-
-	// 配列の開放．
-	delete[] fvec, fjac;
-	MKL_Free_Buffers();
-
-	return RCI_Request;
-}
-
 // 動解析の設定初期化．
 void BS_Calculator::init_dyn(const BS_FileIn::Dynamic&dyn, int ballnum) {
 
 	// 動解析設定
-	int num_loop = dyn.set.sampling;
-	BS_Calculator::dyn.set.t_end = dyn.set.calctime;
+	BS_Calculator::dyn.set[0].nX = 4 * ballnum + 11;
+	BS_Calculator::dyn.set[1].nX = 13 * (ballnum + 2);
 
-	BS_Calculator::dyn.set.t_step = dyn.set.calctime / num_loop;
-	BS_Calculator::dyn.set.nX = 13 * (ballnum + 2);
-	BS_Calculator::dyn.set.h = dyn.set.h;
-	BS_Calculator::dyn.set.hmin = dyn.set.hmin;
-	BS_Calculator::dyn.set.ep = dyn.set.ep;
-	BS_Calculator::dyn.set.tr = dyn.set.tr;
-	BS_Calculator::dyn.set.dpar = new double[13 * BS_Calculator::dyn.set.nX];
-	for (int i = 0; i < 128; i++)
-		BS_Calculator::dyn.set.ipar[i] = 0;
-	BS_Calculator::dyn.set.ipar[1] = 1;
+	for (int i = 0; i < 2; i++) {
 
+		int num_loop = dyn.set[i].sampling;
+
+		BS_Calculator::dyn.set[i].t_end = dyn.set[i].calctime;
+
+		BS_Calculator::dyn.set[i].t_step = dyn.set[i].calctime / num_loop;
+		BS_Calculator::dyn.set[i].h = dyn.set[i].h;
+		BS_Calculator::dyn.set[i].hmin = dyn.set[i].hmin;
+		BS_Calculator::dyn.set[i].ep = dyn.set[i].ep;
+		BS_Calculator::dyn.set[i].tr = dyn.set[i].tr;
+		BS_Calculator::dyn.set[i].dpar = new double[13 * BS_Calculator::dyn.set[i].nX];
+
+		for (int j = 0; j < 128; j++)
+			BS_Calculator::dyn.set[i].ipar[j] = 0;
+
+		BS_Calculator::dyn.set[i].ipar[1] = 1;
+	}
 
 	BS_Calculator::dyn.wxt = dyn.wxt;
 	BS_Calculator::dyn.vxt = dyn.vxt;
@@ -301,11 +242,21 @@ void BS_Calculator::init_dyn(const BS_FileIn::Dynamic&dyn, int ballnum) {
 	return;
 }
 
+// ベクトル表現による運動方程式の定義．12*2+9*n次元で構成されている．
+// intel_odeライブラリの書式に準じているため，詳細はそちらのマニュアル参照．
+void BS_Calculator::Dyn_Eq0(int*n, double*t, double*y, double*dydt) {
 
+	BS.set_dyn_y0(y);
+	BS.get_dyn_dydt0(dydt);
+
+	//std::cout << "y[10]" << y[10] << ",\t dydt[0]" << dydt[10] << std::endl;
+
+	return;
+}
 
 // ベクトル表現による運動方程式の定義．12*2+9*n次元で構成されている．
 // intel_odeライブラリの書式に準じているため，詳細はそちらのマニュアル参照．
-void BS_Calculator::Dyn_Eq(int*n, double*t, double*y, double*dydt) {
+void BS_Calculator::Dyn_Eq1(int*n, double*t, double*y, double*dydt) {
 	// 時間から入力条件を取得
 	double t0 = *t * Rigid::t;
 	double dvdt = 0.0;
@@ -315,12 +266,12 @@ void BS_Calculator::Dyn_Eq(int*n, double*t, double*y, double*dydt) {
 	//BS_Calculator::get_dwdt(t0, dwdt);
 	dwdt = BS_Calculator::get_dvdt(t0, dyn.wxt);
 	dvdt = BS_Calculator::get_dvdt(t0, dyn.vxt);
-	
+
 	// まず入力値から各部材の変位を更新．
-	BS.set_y(y);
+	BS.set_dyn_y1(y);
 	BS.set_load(F, T);
 	// 更新した変位から荷重を計算．
-	BS.get_dydt(dydt, dvdt, dwdt);
+	BS.get_dyn_dydt1(dydt, dvdt, dwdt);
 
 	return;
 }
@@ -331,12 +282,17 @@ void BS_Calculator::Dyn_void(void) {
 }
 
 // Intel ODE Solver を用いて動解析を行う．（内部の記載はほとんどコピペ．dodesolは取得後変更無し．）
-void BS_Calculator::Dyn_solve(double*x0, double*t) {
+void BS_Calculator::Dyn_solve(double*x0, double*t, int i) {
 
 	double t0 = t[0] / Rigid::t;
 	double t1 = t[1] / Rigid::t;
 
-	dodesol(dyn.set.ipar, &dyn.set.nX, &t0, &t1, x0, &Dyn_Eq, &Dyn_void, &dyn.set.h, &dyn.set.hmin, &dyn.set.ep, &dyn.set.tr, dyn.set.dpar, dyn.set.kd, &dyn.set.ierr);
+	if (i == 0) 
+		dodesol(dyn.set[i].ipar, &dyn.set[i].nX, &t0, &t1, x0, &Dyn_Eq0, &Dyn_void, &dyn.set[i].h, &dyn.set[i].hmin, &dyn.set[i].ep, &dyn.set[i].tr, dyn.set[i].dpar, dyn.set[i].kd, &dyn.set[i].ierr);
+
+	else if (i == 1) 
+		dodesol(dyn.set[i].ipar, &dyn.set[i].nX, &t0, &t1, x0, &Dyn_Eq1, &Dyn_void, &dyn.set[i].h, &dyn.set[i].hmin, &dyn.set[i].ep, &dyn.set[i].tr, dyn.set[i].dpar, dyn.set[i].kd, &dyn.set[i].ierr);
+
 
 	t[0] = t0 * Rigid::t;
 	t[1] = t1 * Rigid::t;
@@ -368,8 +324,8 @@ double BS_Calculator::get_dvdt(double t, const map<double, double> &vxt) {
 
 
 // 時刻tにおける外部荷重を線形補間で計算
-void BS_Calculator::get_Load(double t, map<double, vector<double>>ft, double *F, double *T){
-	
+void BS_Calculator::get_Load(double t, map<double, vector<double>>ft, double *F, double *T) {
+
 	// 荷重条件が入力されていない場合は荷重入力しない
 	if (ft.size() == 0) {
 		auto min = ft.begin();
@@ -640,3 +596,117 @@ int main(void) {
 
 
 
+// MKL "dtrnlsp_solve" を使った静解析ソルバ．使い方はマニュアル参照．（変数のアサインをマニュアルと統一させています．）
+//int BS_Calculator::Stt_solve1
+//(
+//	double*x			// inout:	[-]:	解きたい関数の引数．
+//) {
+//	// ソルバの初期化．
+//	_TRNSP_HANDLE_t handle;
+//	dtrnlsp_init(&handle, &stt.set[1].n, &stt.set[1].m, x, stt.set[1].eps, &stt.set[1].iter1, &stt.set[1].iter2, &stt.set[1].rs);
+//
+//	// 収束計算のループ．関数値およびヤコビアン配列の動的確保．
+//	double *fvec = new double[stt.set[1].m];
+//	double *fjac = new double[stt.set[1].m * stt.set[1].n];
+//	int RCI_Request = 0;
+//
+//	while (true) {
+//		dtrnlsp_solve(&handle, fvec, fjac, &RCI_Request);
+//
+//		if (RCI_Request == -1) {
+//			printf("最大繰り返し数 %d を超過しました．収束に失敗したためプログラムを終了します．\n", stt.set[1].iter1);
+//			break;
+//		}
+//		if (RCI_Request == -2) {
+//			printf("修正量が %e [m/s] を下回りました．収束に失敗したためプログラムを終了します．\n", stt.set[1].eps[0] * Rigid::l / Rigid::t);
+//			break;
+//		}
+//		if (RCI_Request == -3) {
+//			printf("部材の力の釣り合いの平均が基準値 %f ％ を下回りました．計算は収束しました．\n", 100 * sqrt(stt.set[1].eps[1]) / (stt.set[1].m));
+//			break;
+//		}
+//		if (RCI_Request == -4) {
+//			printf("ヤコビアンの行列式が %e [N] を下回りました．収束に失敗したためプログラムを終了します．\n", sqrt(stt.set[1].eps[2]));
+//			break;
+//		}
+//		if (RCI_Request == -5) {
+//			printf("探索域が %e [m/s] を下回りました．収束に失敗したためプログラムを終了します．\n", sqrt(stt.set[1].eps[3])* Rigid::l / Rigid::t);
+//			break;
+//		}
+//		if (RCI_Request == -6) {
+//			printf("1ステップの変化量が %e [N] を下回りました．収束に失敗したためプログラムを終了します．\n", sqrt(stt.set[1].eps[4]));
+//			break;
+//		}
+//		if (RCI_Request == 1)
+//			Stt_Eq1(&stt.set[1].m, &stt.set[1].n, x, fvec);
+//
+//		if (RCI_Request == 2)
+//			djacobi(Stt_Eq1, &stt.set[1].n, &stt.set[1].m, fjac, x, &stt.set[1].jac_eps);
+//	}
+//
+//	// ソルバのシャットダウン．
+//	dtrnlsp_delete(&handle);
+//
+//	// 配列の開放．
+//	delete[] fvec, fjac;
+//	MKL_Free_Buffers();
+//
+//	return RCI_Request;
+//}
+// MKL "dtrnlsp_solve" を使った静解析ソルバ．使い方はマニュアル参照．（変数のアサインをマニュアルと統一させています．）
+//int BS_Calculator::Stt_solve2
+//(
+//	double*x			// inout:	[-]:	解きたい関数の引数．
+//) {
+//	// ソルバの初期化．
+//	_TRNSP_HANDLE_t handle;
+//	dtrnlsp_init(&handle, &stt.set[2].n, &stt.set[2].m, x, stt.set[2].eps, &stt.set[2].iter1, &stt.set[2].iter2, &stt.set[2].rs);
+//
+//	// 収束計算のループ．関数値およびヤコビアン配列の動的確保．
+//	double *fvec = new double[stt.set[2].m];
+//	double *fjac = new double[stt.set[2].m * stt.set[2].n];
+//	int RCI_Request = 0;
+//
+//	while (true) {
+//		dtrnlsp_solve(&handle, fvec, fjac, &RCI_Request);
+//
+//		if (RCI_Request == -1) {
+//			printf("最大繰り返し数 %d を超過しました．収束に失敗したためプログラムを終了します．\n", stt.set[2].iter1);
+//			break;
+//		}
+//		if (RCI_Request == -2) {
+//			printf("修正量が %e [m/s] を下回りました．収束に失敗したためプログラムを終了します．\n", stt.set[2].eps[0] * Rigid::l / Rigid::t);
+//			break;
+//		}
+//		if (RCI_Request == -3) {
+//			printf("部材の力の釣り合いが基準値 %e [N] を下回りました．計算は収束しました．\n", sqrt(stt.set[2].eps[1]));
+//			break;
+//		}
+//		if (RCI_Request == -4) {
+//			printf("ヤコビアンの行列式が %e [N] を下回りました．収束に失敗したためプログラムを終了します．\n", sqrt(stt.set[2].eps[2]));
+//			break;
+//		}
+//		if (RCI_Request == -5) {
+//			printf("探索域が %e [m/s] を下回りました．収束に失敗したためプログラムを終了します．\n", sqrt(stt.set[2].eps[3])* Rigid::l / Rigid::t);
+//			break;
+//		}
+//		if (RCI_Request == -6) {
+//			printf("1ステップの変化量が %e [N] を下回りました．収束に失敗したためプログラムを終了します．\n", sqrt(stt.set[2].eps[4]));
+//			break;
+//		}
+//		if (RCI_Request == 1)
+//			Stt_Eq2(&stt.set[2].m, &stt.set[2].n, x, fvec);
+//
+//		if (RCI_Request == 2)
+//			djacobi(Stt_Eq2, &stt.set[2].n, &stt.set[2].m, fjac, x, &stt.set[2].jac_eps);
+//	}
+//
+//	// ソルバのシャットダウン．
+//	dtrnlsp_delete(&handle);
+//
+//	// 配列の開放．
+//	delete[] fvec, fjac;
+//	MKL_Free_Buffers();
+//
+//	return RCI_Request;
+//}

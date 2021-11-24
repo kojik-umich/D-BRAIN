@@ -7,7 +7,7 @@
 !	の二種類ある．（現状のアセンブリシャフトは1つの組み合わせしか考慮できない）
 !	このクラスではアセンブリシャフトを定義しており，
 !	Cylinderクラスでねじ溝の詳細な形状を定義している．
-!	
+!
 !*******************************************************************************/
 #include "BS_Shaft.h"
 
@@ -42,6 +42,11 @@ void BS_Shaft::init(const std::vector<BS_In::Cylinder>&cylinders, const bool(&v_
 
 	this->set_const(v_const, w_const);
 
+	//this->free_num = 6;
+	//for (int i = 0; i < 3; i++) {
+	//	this->free_num -= int(this->x_const[i]);
+	//	this->free_num -= int(this->Rx_const[i]);
+	//}
 	return;
 }
 
@@ -63,7 +68,9 @@ void BS_Shaft::init_pos(double v0, double w0) {
 // step0（剛性計算）用のインタフェイス．
 void BS_Shaft::get_y0(double*y0) {
 
-	y0[0] = this->x.x() / Rigid::l;
+	if (!this->x_const.y()) {
+		y0[0] = this->x.x() / Rigid::l;
+	}
 	y0[1] = this->x.y() / Rigid::l;
 	y0[2] = this->x.z() / Rigid::l;
 
@@ -92,33 +99,6 @@ void BS_Shaft::set_y0(const double*y0, double v0, double w0) {
 		this->w = w0 * ax;
 		this->set_dx();
 	}
-	/*
-	Vector3d _y0, ax;
-	for (int i = 0; i < 3; i++) {
-		_y0(i) = y0[i] * Rigid::l;
-	}
-	// 静解析では慣性座標系で拘束
-	this->x = (this->x_const == true).select(this->x, _y0);
-	if (this->Rx_const.y()) {
-		ax.y() = 0;
-	}
-	else {
-		ax.y() = y0[4];
-	}
-	if (this->Rx_const.z()) {
-		ax.z() = 0;
-	}
-	else {
-		ax.z() = y0[5];
-	}
-	ax.x() = sqrt(1.0 - Numeric::Square(ax.y()) - Numeric::Square(ax.z()));
-	this->set_ax(ax);
-
-	// 静解析ではx, Rx方向は拘束
-	this->v = v0 * ax;
-	this->w = w0 * ax;
-	this->set_dx();
-	*/
 	return;
 }
 
@@ -137,6 +117,56 @@ void BS_Shaft::set_y_(const Vector3d&x, const Vector3d&v, const Quaterniond&q, c
 	return;
 }
 
+// step0（剛性計算）用のインタフェイス．
+void BS_Shaft::init_dyn0(void) {
+
+	this->mem.v = this->v;
+	this->mem.w = this->w;
+
+	this->v = Vector3d::Zero();
+	this->w = Vector3d::Zero();
+
+	return;
+}
+
+// step0（剛性計算）用のインタフェイス．
+void BS_Shaft::get_dyn_y0(double*y0) {
+
+	for (int i = 0; i < 3; i++) {
+		y0[i + 0] = this->x[i];
+		y0[i + 3] = this->v[i];
+		y0[i + 8] = this->w[i];
+	}
+	y0[6] = this->q.y() * 2;
+	y0[7] = this->q.z() * 2;
+
+	return;
+}
+
+// step0（剛性計算）用のインタフェイス．(拘束条件は要修正)
+void BS_Shaft::set_dyn_y0(const double*y0) {
+
+	using namespace Numeric;
+
+	Vector3d x_now = this->x;
+	Vector3d x = this->x_const.select(x_now, Vector3d(y0[0], y0[1], y0[2])) * Rigid::l;
+	Vector3d v = Vector3d(y0[3], y0[4], y0[5]) * Rigid::l / Rigid::t;
+
+	Vector3d t_now = 2 * Vector3d(0, this->q.y(), this->q.z());
+	Vector3d t = this->Rx_const.select(t_now, Vector3d(0, y0[6], y0[7]));
+	double   tw = sqrt(1.0 - Square(0.5*t.y()) - Square(0.5*t.z()));
+	Vector3d w = Vector3d(y0[8], y0[9], y0[10]) / Rigid::t;
+
+	this->x = x;
+	this->v = v;
+	this->q = Quaterniond(tw, 0, 0.5*t.y(), 0.5*t.z());
+	this->w = w;
+
+	this->set_dx();
+
+	return;
+}
+
 // F, T の入力により x, v, q, w 全ての時間微分値を返すメソッド．値を全て無次元量にして返す．
 void BS_Shaft::get_dydt_(
 	const Vector3d&F,	// in:	[N]:		外部荷重．
@@ -144,7 +174,7 @@ void BS_Shaft::get_dydt_(
 	double dvdt0,		// in:	[m/s^2]:	速度の時間変化量
 	double dwdt0,		// in:	[rad/s^2]	回転数の時間変化量
 	double*dydt			// out:	[any]:		全微分値．
-) {	
+) {
 	// 姿勢拘束（角速度とクォータニオンの両方を拘束，軸方向x回りの回転のみ物体座標系で拘束）
 	Vector4d dqdt = this->get_dqdt_(this->Rx_const.y(), this->Rx_const.z(), this->tan_thy, this->tan_thz) * Rigid::t;
 	Vector3d dwdt = this->get_dwdt_(T, this->Rx_const.y(), this->Rx_const.z(), dwdt0) * Rigid::t * Rigid::t;
@@ -183,16 +213,18 @@ Vector4d BS_Shaft::get_dqdt_(bool wy_const, bool wz_const, double tan_thy, doubl
 	else if (wy_const && !wz_const) {
 		// Vector4d のコンストラクタは(x, y, z, w)の順番
 		Vector4d _Cq(qz + tan_thy * qx, -qw - tan_thy * qy,
-			qx - tan_thy * qz, - qy + tan_thy * qw);
+			qx - tan_thy * qz, -qy + tan_thy * qw);
 		Vector4d Cq = _Cq * 2;
 		double C = 2 * (qx * qz - qy * qw) +
 			(qx * qx - qy * qy - qz * qz + qw * qw) * tan_thy;
+
 		// 0割りの判定(多分いらない)
-		if (Cq.norm() < 1e-20) {
+		double Cq_square = Cq.squaredNorm();
+		if (Cq_square < 1e-20) {
 			dqdt = qw_half;
 		}
 		else {
-			dqdt = qw_half - Cq * (qw_half.dot(Cq) + 1 / tau * C) / Cq.dot(Cq);
+			dqdt = qw_half - Cq * (qw_half.dot(Cq) + 1 / tau * C) / Cq_square;
 		}
 	}
 	// wz方向が拘束されている場合，wz方向と軸方向に加速度成分を持たないようにする．

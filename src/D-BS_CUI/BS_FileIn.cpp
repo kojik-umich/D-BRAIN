@@ -71,8 +71,10 @@ void BS_FileIn::read_input_all(const char fpath_d4bin_csv[]) {
 	for (int i = 0; i < 3; i++)
 		has_error |= this->read_SttSet(inp_data, i);
 
-	has_error |= this->read_DynSet(inp_data);
+	for (int i = 0; i < 2; i++)
+		has_error |= this->read_DynSet(inp_data, i);
 	has_error |= this->read_Output(inp_data);
+
 
 	has_error |= this->read_DynRotationStep(inp_data);
 	for (size_t i = 0; i < this->dyn.wxt_n; i++)
@@ -86,7 +88,9 @@ void BS_FileIn::read_input_all(const char fpath_d4bin_csv[]) {
 	for (size_t i = 0; i < this->dyn.ft_n; i++)
 		has_error |= this->read_DynLoad(inp_data, i);
 
-	has_error |= this->read_StopDynCalc(inp_data);
+	for (int i = 0; i < 2; i++)
+		has_error |= this->read_StopDynCalc(inp_data, i);
+
 	has_error |= this->read_DeleteLastOutput(inp_data);
 
 	
@@ -743,6 +747,7 @@ bool BS_FileIn::read_SttMode(const vector<vector<string>>&inp_data) {
 		this->stt.run[1] = stoi(param[3]) != 0;
 		this->stt.run[2] = stoi(param[4]) != 0;
 		this->stt.run[3] = stoi(param[5]) != 0;
+		this->stt.run[4] = stoi(param[6]) != 0;
 	}
 	catch (invalid_argument) {
 		return FileIn::invalid_argument_error(param_name);
@@ -775,16 +780,16 @@ bool BS_FileIn::read_SttSet(const vector<vector<string>>&inp_data, int i) {
 }
 
 // “®‰ğÍğŒ“ü—ÍD
-bool BS_FileIn::read_DynSet(const vector<vector<string>>&inp_data) {
-	string param_name = "$$DynSet";
+bool BS_FileIn::read_DynSet(const vector<vector<string>>&inp_data, int i) {
+	string param_name = "$$DynSet" + to_string(i);
 	try {
 		vector<string> param = FileIn::pickup_data(param_name, inp_data);
-		this->dyn.set.calctime = Unit::ms2s(stod(param[1]));
-		this->dyn.set.sampling = Numeric::Roundoff(stod(param[2]));
-		this->dyn.set.h = stod(param[3]);
-		this->dyn.set.hmin = stod(param[4]);
-		this->dyn.set.ep = stod(param[5]);
-		this->dyn.set.tr = stod(param[6]);
+		this->dyn.set[i].calctime = Unit::ms2s(stod(param[1]));
+		this->dyn.set[i].sampling = Numeric::Roundoff(stod(param[2]));
+		this->dyn.set[i].h = stod(param[3]);
+		this->dyn.set[i].hmin = stod(param[4]);
+		this->dyn.set[i].ep = stod(param[5]);
+		this->dyn.set[i].tr = stod(param[6]);
 	}
 	catch (invalid_argument) {
 		return FileIn::invalid_argument_error(param_name);
@@ -992,13 +997,13 @@ bool BS_FileIn::read_DynLoad(const vector<vector<string>>&inp_data, int i) {
 }
 
 // “®‰ğÍŒvZ‘Å‚¿Ø‚èİ’è
-bool BS_FileIn::read_StopDynCalc(const vector<vector<string>>&inp_data) {
-	string param_name = "$$StopDynCalc";
+bool BS_FileIn::read_StopDynCalc(const vector<vector<string>>&inp_data, int i) {
+	string param_name = "$$StopDynCalc" + to_string(i);
 	try {
 		vector<string> param = FileIn::pickup_data(param_name, inp_data);
-		this->dyn.set.stopcalc = (stoi(param[1]) != 0);
-		this->dyn.set.dTerr = Unit::Nmm2Nm(stod(param[2]));
-		this->dyn.set.stp = stoi(param[3]);
+		this->dyn.set[i].stopcalc = (stoi(param[1]) != 0);
+		this->dyn.set[i].dTerr = Unit::Nmm2Nm(stod(param[2]));
+		this->dyn.set[i].stp = stoi(param[3]);
 	}
 	catch (invalid_argument) {
 		return FileIn::invalid_argument_error(param_name);

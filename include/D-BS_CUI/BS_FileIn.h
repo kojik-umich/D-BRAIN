@@ -22,9 +22,8 @@ public:
 
 	struct Initial {
 		enum Preset {			// 初期値設定
-			SimpleCalc	= 0,	// 簡易計算
-			ReadPos		= 1,	// $$Positionから読み取り
-			ReadTemp	= 2		// Tempファイルから読み取り
+			ReadPos		= 0,	// $$Positionから読み取り
+			ReadTemp	= 1		// Tempファイルから読み取り
 		}preset;
 		double x0[3];	// [m/s]:	初期入力変位
 		double ax0[3];	// [rad/s]:	初期入力姿勢
@@ -50,7 +49,7 @@ public:
 
 	bool runStatic;	// 静解析の実行の有無
 	struct Static {
-		bool run[4];		// 静解析の実行の有無
+		bool run[5];		// 静解析の実行の有無
 		struct Set {
 			int n;				// 入力配列サイズ．
 			int m;				// 出力配列サイズ．
@@ -70,8 +69,7 @@ public:
 		map<double, double>wxt;			// 角速度時間変化(first: 時間[s], second:角速度[rad/s])
 		map<double, double>vxt;			// 速度時間変化　(first: 時間[s], second:速度[m/s])
 		map<double, vector<double>>ft;	// 荷重時間変化　(first: 時間[s], second:荷重[N]/[Nm])
-
-
+		
 		struct Set {
 			double calctime;	// 動解析計算時間（計算開始時点の時刻を0sとおいた時の終了時刻）[s]
 			int    sampling;	// 動解析結果出力サンプリング数
@@ -83,7 +81,7 @@ public:
 			bool stopcalc;		// 計算自動停止する(1)，しない(0)
 			double dTerr;		// 自動停止する場合のトルク誤差閾値[Nm]
 			int stp;			// 何step連続で閾値を下回ったら計算終了するか
-		} set;
+		} set[2];
 		
 	} dyn;
 
@@ -129,7 +127,7 @@ private:
 	bool read_SttRotation(const vector<vector<string>>& inp_data);
 	bool read_SttMode(const vector<vector<string>>& inp_data);
 	bool read_SttSet(const vector<vector<string>>& inp_data, int i);
-	bool read_DynSet(const vector<vector<string>>& inp_data);
+	bool read_DynSet(const vector<vector<string>>& inp_data, int i);
 	bool read_Bound(const vector<vector<string>>& inp_data);
 	void calc_Mass(void);
 	bool read_Output(const vector<vector<string>>& inp_data);
@@ -137,9 +135,9 @@ private:
 	bool read_DynRotation(const vector<vector<string>>& inp_data, int i);
 	bool read_DynLoadStep(const vector<vector<string>>& inp_data);
 	bool read_DynLoad(const vector<vector<string>>& inp_data, int i);
+	bool read_StopDynCalc(const vector<vector<string>>& inp_data, int i);
 	static double calc_phase(double l, double x);
 	void set_Circuitphase(int i);
-	bool read_StopDynCalc(const vector<vector<string>>&inp_data);
 	bool read_DeleteLastOutput(const vector<vector<string>>&inp_data);
 	bool read_DynVelocityStep(const vector<vector<string>>&inp_data);
 	bool read_DynVelocity(const vector<vector<string>>&inp_data, int i);

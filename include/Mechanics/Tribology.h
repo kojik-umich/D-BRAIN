@@ -35,6 +35,10 @@ namespace Tribology {
 	public:
 		double calc(double mu0, double us, double ur, double s);
 	};
+	class SimpleCoulomb : public Coulomb {
+	public:
+		double calc(double mu0, double us, double ur, double s);
+	};
 
 	// Hertz ‚ÌÚGŒvZ®D
 	class Hertz {

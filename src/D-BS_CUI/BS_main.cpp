@@ -90,6 +90,7 @@ C言語ライブラリの使用でLNK2019エラーが出る場合はextern"C"を
 !*******************************************************************************/
 
 #define _MAX_STRING_ 256
+#define _DYN_LAST_    1
 
 #include <iostream>			// cmd画面出力のため．
 #include <string.h>			// ファイル名操作のため．
@@ -106,6 +107,8 @@ using Eigen::VectorXd;		// Tempファイル出力のため．
 #include "BS_BallScrew.h"
 #include "Rigid.h"
 #include "LicenceSimple.h"
+
+int sub_Dynamic(BS_Calculator & calc, BS_FileOut&FO, int i, double*t, double*y, string&Temp, bool stopcalc, VectorXd&y_, double dTerr, int stp);
 
 int main(int argc, char *argv[]) {
 
@@ -154,192 +157,143 @@ int main(int argc, char *argv[]) {
 	calc.BS.allocate(FI);
 	calc.BS.init(FI, FI.stt.v0, FI.stt.w0, FI.stt.wn);
 
+	// 出力形式について初期化．
+	BS_FileOut FO;
+	FO.init(FI);
+	BS_Calculator::init_stt(FI.stt, FI.ballnum);
+	BS_Calculator::init_dyn(FI.dyn, FI.ballnum);
+
 	// シャフト初期位置決定．
 	string Temp = FI.output.temp + ".csv";
 	double t_str = 0; // 初期時刻[s]
 	std::cout << std::endl << "$$PositionSet の設定が" << int(FI.initial.preset) << "であったため";
 	switch (FI.initial.preset) {
-	case BS_FileIn::Initial::Preset::SimpleCalc:
-		std::cout << "おおよその位置へシャフトを移動します．" << std::endl;
-		calc.BS.preset_y0(1e-9, 1e-12);
-		break;
 	case BS_FileIn::Initial::Preset::ReadPos:
 		std::cout << "シャフト初期位置を入力値へ移動します．" << std::endl;
 		calc.BS.lock_y0(FI.initial.x0, FI.initial.ax0, FI.stt.v0, FI.stt.w0);
 		break;
 	case BS_FileIn::Initial::Preset::ReadTemp:
 		std::cout << "tempファイルから玉・シャフトの位置・速度と現在時刻を取得します．" << std::endl;
-		double  *_y = new double[BS_Calculator::dyn.set.nX];
-		BS_FileOut::read_Params(Temp, BS_Calculator::dyn.set.nX, t_str, _y);
-		calc.BS.set_y(_y);
+		double  *_y = new double[BS_Calculator::dyn.set[_DYN_LAST_].nX];
+		BS_FileOut::read_Params(Temp, BS_Calculator::dyn.set[_DYN_LAST_].nX, t_str, _y);
+		calc.BS.set_dyn_y1(_y);
 		break;
 	}
-	
+
 	// 静解析．
 	std::cout << std::endl << "【D-BS 静解析】" << std::endl;
-	
-	calc.init_stt(FI.stt, FI.ballnum);
 	
 	if (!FI.runStatic)
 		std::cout << "は $$SttMode = 0 であったため行いません．" << std::endl;
 
 	else {
-		// step0（剛性計算）．MKL "dtrnlsp_solve" を使って解く．
-		std::cout << std::endl << "【step0：剛性計算】" << std::endl;
+		// step0（玉一様移動簡易計算）
+		std::cout << std::endl << "【step0：玉一様移動簡易計算】" << std::endl;
 		if (!FI.stt.run[0])
+			std::cout << "は入力が0であったため行いません．" << std::endl;
+
+		else {
+			std::cout << "おおよその位置へシャフトを移動します．" << std::endl;
+			if (calc.BS.shaft_DOF() < 5)
+				std::cout << "完全非拘束でない場合の簡易計算は推奨されません．ねじ位置は入力拘束値と異なる変位に固定されます．" << std::endl;
+
+			calc.BS.preset_y0(1e-9, 1e-12, 1e-9);
+		}
+		// step1（剛性計算）．MKL "dtrnlsp_solve" を使って解く．
+		std::cout << std::endl << "【step1：剛性計算】" << std::endl;
+		if (!FI.stt.run[1])
 			std::cout << "は入力が0であったため行いません．" << std::endl;
 
 		else {
 			double *x0 = new double[BS_Calculator::stt.set[0].n];
 			calc.BS.get_y0(x0);
-			int RCI_Request = BS_Calculator::Stt_solve0(x0);
+			int RCI_Request = BS_Calculator::Stt_solve(0, x0);
 			delete[] x0;
 			if (RCI_Request != -3)
-				if (!FI.stt.run[1])
+				if (!FI.stt.run[2])
 					return -1;
 				else
 					std::cout << "収束はしませんでしたが次のSTEP1で釣り合う可能性もあるため，計算を続行します．" << std::endl;
 		}
-		// step1（摩擦計算）．MKL "dtrnlsp_solve" を使って解く．
-		std::cout << std::endl << "【step1：簡易摩擦計算】" << std::endl;
-		if (!FI.stt.run[1])
-			std::cout << "は入力が0であったため行いません．" << std::endl;
-
-		else {
-			double *x1 = new double[BS_Calculator::stt.set[1].n];
-			calc.BS.get_y0(x1);
-			int RCI_Request = BS_Calculator::Stt_solve1(x1);
-			delete[] x1;
-			if (RCI_Request != -3)
-				return -1;
-		}
-		// step1.5（純転がり速度計算）．恒等式から各玉の主荷重2点での純転がり速度を求める．
-		std::cout << std::endl << "【step1.5：純転がり速度計算】" << std::endl;
+		// step2（摩擦計算）．MKL "dtrnlsp_solve" を使って解く．
+		std::cout << std::endl << "【step2：簡易摩擦計算】" << std::endl;
 		if (!FI.stt.run[2])
 			std::cout << "は入力が0であったため行いません．" << std::endl;
 
 		else {
+			int i = 0;
+			double  *y = new double[BS_Calculator::dyn.set[i].nX];
+			VectorXd y_temp = VectorXd(1);
+			double t0[2];
+			t0[0] = 0;	t0[1] = BS_Calculator::dyn.set[i].t_step;
+			calc.BS.get_dyn_y0(y);
+
+			sub_Dynamic(calc, FO, i, t0, y, Temp, FI.dyn.set[i].stopcalc, y_temp, FI.dyn.set[i].dTerr, FI.dyn.set[i].stp);
+			//double *x1 = new double[BS_Calculator::stt.set[1].n];
+			//calc.BS.get_y0(x1);
+			//int RCI_Request = BS_Calculator::Stt_solve(1, x1);
+			//delete[] x1;
+			//if (RCI_Request != -3)
+			//	return -1;
+		}
+		// step2.5（純転がり速度計算）．恒等式から各玉の主荷重2点での純転がり速度を求める．
+		std::cout << std::endl << "【step2.5：純転がり速度計算】" << std::endl;
+		if (!FI.stt.run[3])
+			std::cout << "は入力が0であったため行いません．" << std::endl;
+
+		else
+			calc.BS.pure_Rolling();
+
+		// step3（定常状態）．恒等式から各玉の主荷重2点での純転がり速度を求める．
+		std::cout << std::endl << "【step3：定常状態計算】" << std::endl;
+		if (!FI.stt.run[4])
+			std::cout << "は入力が0であったため行いません．" << std::endl;
+
+		else {
+			if (!FI.stt.run[3])
+				std::cout << "注意！純転がり計算をしないと収束しない危険性が高まります！設定を見直してください！" << std::endl;
 			double *x2 = new double[BS_Calculator::stt.set[2].n];
-			for (int i = 0; i < FI.ballnum; i++) {
-				std::cout << "玉番号" << i << ",\t";
-				calc.BS.set_i2(i);
-				calc.BS.get_y2(x2);
-				BS_Calculator::Stt_solve2(x2);
-			}
+			calc.BS.get_y2(x2);
+			int RCI_Request = BS_Calculator::Stt_solve(2, x2);
 			delete[] x2;
+			if (RCI_Request != -3)
+				return -1;
 		}
 	}
 	// 動解析．
-	std::cout << std::endl << "【D-BS 動解析】" << std::endl;
-	calc.init_dyn(FI.dyn, FI.ballnum);
-
-	std::cout << "\n指定ループ回数を達成するか，Enterキーを押せば計算を終了します．" << std::endl << std::endl;
-	
-	// 時間計測開始．
-	std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-
-	double  *y = new double[BS_Calculator::dyn.set.nX];
-	VectorXd y_ = VectorXd(BS_Calculator::dyn.set.nX + 1);
-	double t[2];
-	t[0] = t_str;
-	t[1] = BS_Calculator::dyn.set.t_step + t_str;
-	y_[0] = t[0];
-	calc.BS.get_y(y);
+	double  *y = new double[BS_Calculator::dyn.set[_DYN_LAST_].nX];
+	VectorXd y_ = VectorXd(BS_Calculator::dyn.set[_DYN_LAST_].nX + 1);
+	double t1[2];
+	t1[0] = t_str;
+	t1[1] = BS_Calculator::dyn.set[_DYN_LAST_].t_step + t_str;
+	y_[0] = t1[0];
+	calc.BS.get_dyn_y1(y);
 
 	// 前回計算結果を消去し，初期状態での座標・速度をtempに出力
 	if (FI.output.deletelastout) {
 		FileOut::write_header(Temp, "");
-		for (int i = 0; i < BS_Calculator::dyn.set.nX; i++)
+		for (int i = 0; i < BS_Calculator::dyn.set[_DYN_LAST_].nX; i++)
 			y_[i + 1] = y[i];
 		FileOut::write_vector(Temp, y_, 15);
 	}
-	BS_FileOut FO;
-	FO.init(FI);
 
-	// 計算自動終了がある場合，1ステップごとに収束判定
-	if (FI.dyn.set.stopcalc) {
-		// 1回目の計算で打ち切りしないようにトルクの初期値は十分大きい数値に設定
-		double Ti0 = 1e10, Ti1 = 0;
-		int cnt = 0;
+	std::cout << std::endl << "【D-BS 動解析】" << std::endl;
+	sub_Dynamic(calc, FO, _DYN_LAST_, t1, y, Temp, FI.dyn.set[_DYN_LAST_].stopcalc, y_, FI.dyn.set[_DYN_LAST_].dTerr, FI.dyn.set[_DYN_LAST_].stp);
 
-		while (t[0] < BS_Calculator::dyn.set.t_end) {
-			calc.Dyn_solve(y, t);
-
-			// 次の時間ステップの設定．（t[0]はDyn_solve内で自動的にt[1]に変更される．）
-			t[1] += BS_Calculator::dyn.set.t_step;
-			std::cout << "\r" << "Now " << 1e3 * t[0] << " [ms].\t"
-				<< int(100.0 * t[0] / BS_Calculator::dyn.set.t_end) << "% Complete." << std::string(20, ' ');
-
-			// 1ステップ終了ごとにテキストに書き込む．
-			y_[0] = t[0];
-			calc.BS.get_y(y);
-			for (int i = 0; i < BS_Calculator::dyn.set.nX; i++)
-				y_[i + 1] = y[i];
-			FileOut::write_vector(Temp, y_, 15);
-
-			// enterキーを押したらループ中断
-			if (_kbhit() != 0 && _getch() == '\r')
-				break;
-
-			// 収束判定を行い，指定された回数連続で基準値を下回っていた場合はループ中断
-			calc.BS.save(FO);
-			Ti1 = FO.ST_CY[0].Ts[0];
-			double dT = Ti1 - Ti0;
-			cout << "dT = " << Unit::Nm2Nmm(dT) << " [Nmm]";
-			if (abs(dT) < FI.dyn.set.dTerr) {
-				cnt++;
-			}
-			else {
-				cnt = 0;
-			}
-			std::cout << "\tcount = " << cnt;
-			if (cnt >= FI.dyn.set.stp) {
-				std::cout << std::endl << "打ち切り基準値を" << FI.dyn.set.stp
-					<< "回連続で下回ったので計算を打ち切ります" << std::endl;
-				break;
-			}
-
-			Ti0 = Ti1;
-		}
-	}
-	// 自動終了がないとき，収束判定しない（ソルバー内の収束判定はある）
-	else {
-		while (t[0] < BS_Calculator::dyn.set.t_end) {
-			calc.Dyn_solve(y, t);
-
-			// 次の時間ステップの設定．（t[0]はDyn_solve内で自動的にt[1]に変更される．）
-			t[1] += BS_Calculator::dyn.set.t_step;
-			std::cout << "\r" << "Now " << 1e3 * t[0] << " [ms].\t"
-				<< int(100.0 * t[0] / BS_Calculator::dyn.set.t_end) << "% Complete." << std::string(20, ' ');;
-
-			// 1ステップ終了ごとにテキストに書き込む．
-			y_[0] = t[0];
-			calc.BS.get_y(y);
-			for (int i = 0; i < BS_Calculator::dyn.set.nX; i++)
-				y_[i + 1] = y[i];
-			FileOut::write_vector(Temp, y_, 15);
-
-			// enterキーを押したらループ中断
-			if (_kbhit() != 0 && _getch() == '\r')
-				break;
-		}
-	}
-	std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
-	double elapsed = double(std::chrono::duration_cast<std::chrono::seconds>(end - start).count());
-	std::cout << std::endl << std::endl << "計算に " << elapsed << " [s] かかりました．" << std::endl << std::endl << "ポスト処理に移行します．" << std::endl;
+	std::cout << "ポスト処理に移行します．" << std::endl;
 
 	// とりあえずベタ打ちでポスト処理．
 	FO.write_AllHeader();
 	ifstream ifs(Temp);
 	string line;
-	double*Params = new double[BS_Calculator::dyn.set.nX];
+	double*Params = new double[BS_Calculator::dyn.set[_DYN_LAST_].nX];
 	while (getline(ifs, line)) {
 		vector<string> strvec = FileIn::split(line, ',');
-		for (int i = 0; i < BS_Calculator::dyn.set.nX; i++)
+		for (int i = 0; i < BS_Calculator::dyn.set[_DYN_LAST_].nX; i++)
 			Params[i] = stod(strvec.at(i + 1));
-		calc.BS.set_y(Params);
+		calc.BS.set_dyn_y1(Params);
 
-		calc.BS.get_dydt(y, 0, 0);	// 0/0 は v/w の加減速パラメタ．ポスト処理に加減速は含まれないが，一応0で定常状態を出力させる．
+		calc.BS.get_dyn_dydt1(y, 0, 0);	// 0/0 は v/w の加減速パラメタ．ポスト処理に加減速は含まれないが，一応0で定常状態を出力させる．
 		calc.BS.save(FO);
 		FO.write_AllParams(stod(strvec.at(0)));
 	}
@@ -351,6 +305,73 @@ int main(int argc, char *argv[]) {
 	// 正常終了．
 	return 0;
 }
+
+// 動解析．
+int sub_Dynamic(BS_Calculator & calc, BS_FileOut&FO, int i, double*t, double*y, string&Temp, bool stopcalc, VectorXd&y_, double dTerr, int stp) {
+
+	std::cout << "\n指定ループ回数を達成するか，Enterキーを押せば計算を終了します．" << std::endl << std::endl;
+
+	// 時間計測開始．
+	std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+
+	// 1回目の計算で打ち切りしないようにトルクの初期値は十分大きい数値に設定
+	double Ti0 = 1e10, Ti1 = 0;
+	int cnt = 0;
+
+	while (t[0] < BS_Calculator::dyn.set[i].t_end) {
+
+		bool finished = false;
+
+		calc.Dyn_solve(y, t, i);
+
+		// 次の時間ステップの設定．（t[0]はDyn_solve内で自動的にt[1]に変更される．）
+		t[1] += BS_Calculator::dyn.set[i].t_step;
+		std::cout << "\r" << "Now " << 1e3 * t[0] << " [ms].\t"
+			<< int(100.0 * t[0] / BS_Calculator::dyn.set[i].t_end) << "% Complete." << std::string(20, ' ');
+
+		// 1ステップ終了ごとにテキストに書き込む．
+		if (i == _DYN_LAST_) {
+			y_[0] = t[0];
+			calc.BS.get_dyn_y1(y);
+			for (int i = 0; i < BS_Calculator::dyn.set[i].nX; i++)
+				y_[i + 1] = y[i];
+			FileOut::write_vector(Temp, y_, 15);
+		}
+		// enterキーを押したらループ中断
+		if (_kbhit() != 0 && _getch() == '\r')
+			finished = true;
+
+		// 計算自動終了がある場合，1ステップごとに収束判定
+		if (stopcalc) {
+			// 収束判定を行い，指定された回数連続で基準値を下回っていた場合はループ中断
+			calc.BS.save(FO);
+			Ti1 = FO.ST_CY[0].Ts[0];
+			double dT = Ti1 - Ti0;
+			cout << "dT = " << Unit::Nm2Nmm(dT) << " [Nmm]";
+			if (abs(dT) < dTerr) {
+				cnt++;
+			}
+			else {
+				cnt = 0;
+			}
+			std::cout << "\tcount = " << cnt;
+			if (cnt >= stp) {
+				std::cout << std::endl << "打ち切り基準値を" << stp
+					<< "回連続で下回ったので計算を打ち切ります" << std::endl;
+				finished = true;
+			}
+			Ti0 = Ti1;
+		}
+		if (finished)
+			break;
+	}
+	std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+	double elapsed = double(std::chrono::duration_cast<std::chrono::seconds>(end - start).count());
+	std::cout << std::endl << std::endl << "計算に " << elapsed << " [s] かかりました．" << std::endl << std::endl;
+
+	return 0;
+}
+
 
 
 

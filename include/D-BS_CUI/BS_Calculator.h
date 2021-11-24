@@ -15,7 +15,7 @@ public:
 	static BS_BallScrew BS;
 
 	// 静解析のために必要なグローバル変数パラメタ群．MKLでは関数の形が決まっているため，このような形で値を受け渡す．
-	static struct Stt {			
+	static struct Stt {
 		struct Set {
 			int n;				// 入力配列サイズ．
 			int m;				// 出力配列サイズ．
@@ -43,12 +43,11 @@ public:
 			int ierr;
 			int kd[2];
 			int ipar[128];
-		} set;
-		
+		} set[2];
+
 		map<double, double>wxt;				// 角速度時間変化(first: 時間[s], second:角速度[rad/s])
 		map<double, double>vxt;				// 速度時間変化　(first: 時間[s], second:速度[m/s])
 		map<double, vector<double>>ft;		// 荷重時間変化　(first: 時間[s], second:荷重[N]/[Nm])
-
 
 		struct Load {
 			//bool is_change;		// 速度条件を切り替えるかどうか（≒変化ステップ2以上）
@@ -61,8 +60,9 @@ public:
 			int i0;				// 現在の区間
 		} lod;
 	}dyn;
+
 public:
-	void init_stt(const BS_FileIn::Static & stt, int ballnum);
+	static void init_stt(const BS_FileIn::Static & stt, int ballnum);
 
 private:
 	static void Stt_Eq0(int * m, int * n, double * x, double * f);
@@ -70,16 +70,14 @@ private:
 	static void Stt_Eq2(int * m, int * n, double * x, double * f);
 
 public:
-	static int Stt_solve0(double*x);
-	static int Stt_solve1(double * x);
-	static int Stt_solve2(double * x);
+	static int Stt_solve(int i, double*x);
 
 public:
-	void init_dyn(const BS_FileIn::Dynamic & dyn, int ballnum);
-
-
+	static void init_dyn(const BS_FileIn::Dynamic & dyn, int ballnum);
+	   
 private:
-	static void Dyn_Eq(int *n, double *t0, double *y, double *dydt);
+	static void Dyn_Eq0(int * n, double * t, double * y, double * dydt);
+	static void Dyn_Eq1(int *n, double *t0, double *y, double *dydt);
 	static void Dyn_void(void);
 	//static void get_dwdt(double t, double &dwdt);
 	static void get_Load(double t, map<double, vector<double>>ft, double *F, double *T);
@@ -88,7 +86,7 @@ private:
 	static double get_dvdt(double t, const map<double, double>& vxt);
 
 public:
-	static void Dyn_solve(double*x0, double*t);
+	static void Dyn_solve(double * x0, double * t, int i);
 
 
 };

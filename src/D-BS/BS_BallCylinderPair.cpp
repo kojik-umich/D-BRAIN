@@ -27,16 +27,8 @@ bool BS_BallCylinderPair::how_Contact(
 	Vector2d gb = BL_eta - this->CY->SP[iSP].GV[i].eta;
 	double gb_norm = gb.norm();
 
-	// ボール中心がトーラスから出ていたら接していないことにする．
-	if (gb_norm > this->CY->SP[iSP].GV[i].r)
-		return false;
-
 	// 幾何学からボール食い込み量の算出．
 	dx = gb_norm - this->CY->SP[iSP].GV[i].r + this->BL->r;
-
-	// 食い込み量が負値の場合接触していない．
-	if (dx <= 0)
-		return false;
 
 	// 溝中心点とボール中心が一致していたら接していないことにする．（0除算防止）
 	if (gb_norm == 0.0)
@@ -44,7 +36,32 @@ bool BS_BallCylinderPair::how_Contact(
 
 	e = gb / gb_norm;
 
+	// ボール中心がトーラスから出ていたら接していないことにする．
+	if (gb_norm > this->CY->SP[iSP].GV[i].r) {
+		return false;
+	}
+
+	// 食い込み量が負値の場合接触していない．
+	if (dx <= 0)
+		return false;
+
 	return true;
+}
+
+// 接触点数を求めるメソッド．
+int BS_BallCylinderPair::num_Contact() {
+
+	Vector3d th_eta = this->CY->to_etacoord(iSP, this->BL->x);
+	Vector2d eta = Vector2d(th_eta[1], th_eta[2]);		// 玉のη-ζ座標（螺旋座標）
+
+	Vector2d e;
+	double dx;
+
+	int nc = 0;
+	for (int i = 0; i < 2; i++)
+		nc += int(this->how_Contact(i, eta, e, dx));
+
+	return nc;
 }
 
 // Hertzの計算から，荷重を返すメソッド．ダンパによる減衰なし．
@@ -216,10 +233,21 @@ void BS_BallCylinderPair::get_F1(
 				muFb = Vector2d(mu * Fbc_[1], -mu * Fbc_[0]);
 
 			Fbc_ += muFb;
-
-			Fcb_ = this->CY->to_inertialvector(Vector3d(0.0, -Fbc_[0], -Fbc_[1]), xyz2eta);
 			p_ = this->CY->to_inertialcoord(iSP, Vector3d(th, p[0], p[1]));
+
+			//// てすと↓
+			//double k_ = -1e6;
+			//Fbc_ = -e_ * k_ * dx;
+			//// てすと↑
 		}
+		//else {
+		//	// てすと↓
+		//	double k = -1e6;
+		//	Fbc_ = -e_ * k * dx;
+		//	// てすと↑
+		//}
+		Fcb_ = this->CY->to_inertialvector(Vector3d(0.0, -Fbc_[0], -Fbc_[1]), xyz2eta);
+
 		this->save_F0(ig, p_, F_norm, th_eta, a, Fbc_);
 		Fbc += Fbc_;
 		Fcb += Fcb_;
@@ -244,6 +272,60 @@ void BS_BallCylinderPair::get_F2(
 		Vector3d vT_ = this->BL->calc_Torque(p, vF_);
 		vF += vF_;
 		vT += vT_;
+	}
+	return;
+}
+
+// 現在の状態から，ボールと円筒の接触荷重のみを求めるメソッド．
+void BS_BallCylinderPair::get_dyn_F0(
+	bool direction,		// in:	[-]		円筒から見たボール進行方向ベクトル(+x:false，-x:true)
+	Vector3d&Fbc,		// out:	[N]:	ボール(b)が円筒(c)から受ける力（慣性座標系）．
+	Vector3d&Fcb,		// out:	[N]:	円筒(c)がボール(b)から受ける力（慣性座標系）．
+	Vector3d&Tcb		// out:	[Nm]:	円筒(c)がボール(b)から受けるトルク（慣性座標系）．
+) {
+	Vector3d th_eta = this->CY->to_etacoord(iSP, this->BL->x);
+	double th = th_eta[0];
+	Vector2d eta = Vector2d(th_eta[1], th_eta[2]);
+	Matrix3d xyz2eta = this->CY->get_xyz2eta(iSP, th);
+
+	Fbc = Fcb = Tcb = Vector3d::Zero();
+
+	for (int ig = 0; ig < 2; ig++) {
+
+		Vector3d p_, Fcb_;
+		p_ = Fcb_ = Vector3d::Zero();
+
+		double F_norm, a, dx;
+		F_norm = a = 0.0;
+
+		Vector2d e_, Fbc_;
+		Fbc_ = Vector2d::Zero();
+
+		bool is_contact = this->how_Contact(ig, eta, e_, dx);
+
+		if (is_contact) {
+			double Rx, Ry, cos_alp, sin_alp, b, k;
+			Vector2d p, rho;
+			F_norm = this->calc_Hertz(ig, eta, e_, dx, Rx, Ry, p, cos_alp, sin_alp, a, b, k, rho);
+			Fbc_ = -e_ * F_norm;
+
+			// ナット/シャフトから見た玉進行方向の向きから摩擦力の方向を決め打ちで計算
+			Vector2d muFb;
+			double mu = this->GV[ig].mu;
+
+			if (direction)
+				muFb = Vector2d(-mu * Fbc_[1], mu * Fbc_[0]);
+			else
+				muFb = Vector2d(mu * Fbc_[1], -mu * Fbc_[0]);
+
+			Fbc_ += muFb;
+			p_ = this->CY->to_inertialcoord(iSP, Vector3d(th, p[0], p[1]));
+		}
+		Fcb_ = this->CY->to_inertialvector(Vector3d(0.0, -Fbc_[0], -Fbc_[1]), xyz2eta);
+
+		Fbc += Fbc_;
+		Fcb += Fcb_;
+		Tcb += this->CY->calc_Torque(p_, Fcb_);
 	}
 	return;
 }
@@ -494,6 +576,21 @@ void BS_BallCylinderPair::init_Sliceparam(int i) {
 	}
 }
 
+Vector3d BS_BallCylinderPair::get_etav0(void) {
+
+	Vector3d th_eta = this->CY->to_etacoord(this->iSP, this->BL->x);
+	Matrix3d xyz2eta = this->CY->get_xyz2eta(this->iSP, th_eta[0]);
+
+	Vector3d etav = this->CY->to_etavelocity(this->BL->v, xyz2eta);
+
+	return etav;
+}
+
+Vector3d BS_BallNutPair::get_eta0(void) {
+
+	return this->CY->to_etacoord(this->iSP, this->BL->x);
+}
+
 void BS_BallNutPair::set_eta0(const Vector2d & eta) {
 
 	Vector3d eta_ = Vector3d(this->th0, eta[0], eta[1]);
@@ -563,6 +660,9 @@ void BS_BallCylinderPair::init_Tribology(const BS_In::Tribology & tribology) {
 	case BS_In::Tribology::Coulomb::Tangent:
 		this->TB.CL = new Tribology::Tangent();
 		this->TB.cs = tribology.coulomb_slope;
+		break;
+	case BS_In::Tribology::Coulomb::SimpleCoulomb:
+		this->TB.CL = new Tribology::SimpleCoulomb();
 		break;
 	}
 

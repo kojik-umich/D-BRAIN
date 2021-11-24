@@ -90,12 +90,14 @@ public:
 	void link(Ball * BL, BS_Cylinder * CY, int is);
 
 	bool how_Contact(int i, const Vector2d & bl_x, Vector2d & e, double & dx);
+	int num_Contact();
 	double calc_Hertz(int ig, const Vector2d & bl_eta, const Vector2d & e, double dx, double & Rx, double & Ry, Vector2d & p, double & cos_alp, double & sin_alp, double & a, double & b, double & k, Vector2d & rho);
 	double calc_DynamicHertz(int ig, const Vector2d & bl_eta, const Vector2d & bl_etav, const Vector2d & e, double dx, double & Rx, double & Ry, Vector2d & p, double & cos_alp, double & sin_alp, double & a, double & b, Vector2d & rho);
 	void get_F0(Vector2d & Fbc, Vector3d & Fcb, Vector3d & Tcb);
 	void save_F0(int i, const Vector3d & p, double F, const Vector3d & eta, double a, const Vector2d & Fbc);
 	void get_F1(bool v, Vector2d & Fbc, Vector3d & Fcb, Vector3d & Tcb);
 	void get_F2(Vector3d & vF, Vector3d & vT);
+	void get_dyn_F0(bool direction, Vector3d & Fbc, Vector3d & Fcb, Vector3d & Tcb);
 	void get_FT(Vector3d & Fbc, Vector3d & Tbc, Vector3d & Tcb, Vector3d & Fs, Vector3d & Ts);
 	Vector3d get_ur(const Vector3d & p);
 	Vector3d get_us(const Vector3d & p);
@@ -109,6 +111,7 @@ public:
 	void save(BS_Out::BallCylinderPair & OUT);
 	void save_Slice(int i, int j, double farr, const Vector3d& Fs_, const Vector3d& Ts_, double mu_cl, double mu_tr, const Vector3d& us, const Vector3d& ps);
 	void init_Sliceparam(int i);
+	Vector3d get_etav0(void);
 	void write_slice(int ig, Matrix3d xyz2XYZ, BS_Out::BallCylinderPair&BRP);
 	BS_BallCylinderPair();
 	~BS_BallCylinderPair();
@@ -119,6 +122,8 @@ class BS_BallNutPair : public BS_BallCylinderPair {
 
 public:
 	double      th0;	// （主に静解析で利用する）ナットから見た玉の位相角．
+	Vector3d mem_BLv;
+	Vector3d get_eta0(void);
 	void set_eta0(const Vector2d&eta);
 	Vector2d get_etavector0(const Vector3d & x);
 };

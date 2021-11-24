@@ -17,8 +17,9 @@ public:
 		} rollingresistance;
 
 		enum Coulomb {
-			CoulombNothing = 0,	// クーロン摩擦なし．
-			Tangent = 1			// タンジェントカーブ．
+			CoulombNothing = 0,		// クーロン摩擦なし．
+			Tangent = 1,			// タンジェントカーブ．
+			SimpleCoulomb = 2
 		} coulomb;
 		double coulomb_slope;
 
