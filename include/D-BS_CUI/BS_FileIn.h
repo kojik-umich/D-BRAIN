@@ -102,7 +102,7 @@ private:
 	bool read_PreLoad(const vector<vector<string>>& inp_data);
 	bool read_RollingResistance(const vector<vector<string>>&inp_data);
 	bool read_Coulomb(const vector<vector<string>>& inp_data);
-	bool read_EllipseShape(const vector<vector<string>>& inp_data);
+	bool read_Ellipse(const vector<vector<string>>& inp_data);
 	bool read_FilmThickness(const vector<vector<string>>& inp_data);
 	bool read_Hysteresis(const vector<vector<string>>& inp_data);
 	bool read_Dimension(const vector<vector<string>>&inp_data);

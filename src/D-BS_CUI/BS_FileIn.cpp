@@ -58,6 +58,7 @@ void BS_FileIn::read_input_all(const char fpath_d4bin_csv[]) {
 	// 以下，各パラメタに値を代入していく．
 	has_error |= this->read_RollingResistance(inp_data);
 	has_error |= this->read_Coulomb(inp_data);
+	has_error |= this->read_Ellipse(inp_data);
 	has_error |= this->read_FilmThickness(inp_data);
 	has_error |= this->read_Dimension(inp_data);
 	has_error |= this->read_Oil(inp_data);
@@ -310,8 +311,8 @@ bool BS_FileIn::read_Coulomb(const vector<vector<string>>&inp_data) {
 }
 
 // 金属接触滑り摩擦設定条件データ取得
-bool BS_FileIn::read_EllipseShape(const vector<vector<string>>&inp_data) {
-	string param_name = "$$EllipseShape";
+bool BS_FileIn::read_Ellipse(const vector<vector<string>>&inp_data) {
+	string param_name = "$$Ellipse";
 	try {
 		vector<string> param = FileIn::pickup_data(param_name, inp_data);
 		this->tribology.ellipse= static_cast<BS_In::Tribology::Ellipse>(stoi(param[1]));

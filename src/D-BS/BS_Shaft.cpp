@@ -143,10 +143,11 @@ void BS_Shaft::get_dyn_y0(double*y0) {
 	for (int i = 0; i < 3; i++) {
 		y0[i + 0] = this->x[i] / Rigid::l;
 		y0[i + 3] = this->v[i] / Rigid::l * Rigid::t;
-		y0[i + 8] = this->w[i] * Rigid::t;
 	}
 	y0[6] = this->q.y() * 2;
 	y0[7] = this->q.z() * 2;
+	y0[8] = this->w.y() * Rigid::t;
+	y0[9] = this->w.z() * Rigid::t;
 
 	return;
 }
@@ -154,23 +155,23 @@ void BS_Shaft::get_dyn_y0(double*y0) {
 // step0（剛性計算）用のインタフェイス．(拘束条件は要修正)
 void BS_Shaft::set_dyn_y0(const double*y0) {
 
-	using namespace Numeric;
-
 	Vector3d x_now = this->x;
-	Vector3d x = this->x_const.select(x_now, Vector3d(y0[0], y0[1], y0[2]))
-		* Rigid::l;
+	Vector3d x = this->x_const.select(x_now, 
+		Vector3d(y0[0], y0[1], y0[2]) * Rigid::l);
 	Vector3d v = Vector3d(y0[3], y0[4], y0[5]) 
 		* Rigid::l / Rigid::t;
+	Vector3d w = Vector3d(0, y0[8], y0[9])
+		/ Rigid::t;
 
 	Vector3d t_now = 2 * Vector3d(0, this->q.y(), this->q.z());
 	Vector3d t = this->Rx_const.select(t_now, Vector3d(0, y0[6], y0[7]));
-	double   tw = sqrt(1.0 - Square(0.5*t.y()) - Square(0.5*t.z()));
-	Vector3d w = Vector3d(y0[8], y0[9], y0[10])
-		/ Rigid::t;
+	double   qy = 0.5 * t.y();
+	double   qz = 0.5 * t.z();
+	double   qw = sqrt(1.0 - qy * qy - qz * qz);
 
 	this->x = x;
 	this->v = v;
-	this->q = Quaterniond(tw, 0, 0.5*t.y(), 0.5*t.z());
+	this->q = Quaterniond(qw, 0, qy, qz);
 	this->w = w;
 
 	this->set_dx();
@@ -247,12 +248,14 @@ Vector4d BS_Shaft::get_dqdt_(bool wy_const, bool wz_const, double tan_thy, doubl
 		Vector4d Cq = _Cq * 2;
 		double C = 2 * (qx * qy + qz * qw) +
 			(qx * qx - qy * qy - qz * qz + qw * qw) * tan_thz;
+		
 		// 0割りの判定（多分いらない）
-		if (Cq.norm() < 1e-20) {
+		double Cq_sq = Cq.squaredNorm();
+		if (Cq_sq < 1e-20) {
 			dqdt = qw_half;
 		}
 		else {
-			dqdt = qw_half - Cq * (qw_half.dot(Cq) + 1 / tau * C) / Cq.dot(Cq);
+			dqdt = qw_half - Cq * (qw_half.dot(Cq) + 1 / tau * C) / Cq_sq;
 		}
 	}
 	// 軸方向の回転のみ拘束．

@@ -582,14 +582,31 @@ void BS_BallCylinderPair::init_Sliceparam(int i) {
 	}
 }
 
-Vector3d BS_BallCylinderPair::get_etav0(void) {
+Matrix3d BS_BallCylinderPair::get_xyz2eta(void) {
 
 	Vector3d th_eta = this->CY->to_etacoord(this->iSP, this->BL->x);
 	Matrix3d xyz2eta = this->CY->get_xyz2eta(this->iSP, th_eta[0]);
 
+	return xyz2eta;
+}
+
+Vector3d BS_BallCylinderPair::get_etav0(void) {
+
+	Matrix3d xyz2eta = this->get_xyz2eta();
+
 	Vector3d etav = this->CY->to_etavelocity(this->BL->v, xyz2eta);
 
 	return etav;
+}
+
+void BS_BallCylinderPair::set_etav0(const Vector2d & eta) {
+
+	Matrix3d xyz2eta = this->get_xyz2eta();
+
+	this->BL->v = this->CY->to_inertialvelocity(
+		Vector3d(0, eta[0], eta[1]), xyz2eta);
+
+	return;
 }
 
 Vector3d BS_BallNutPair::get_eta0(void) {
@@ -748,11 +765,8 @@ void BS_BallCylinderPair::save(
 // 現在のボール位置における溝進行方向を取得するメソッド（慣性座標系）
 Vector3d BS_BallCylinderPair::get_e(void) {
 
-	Vector3d BL_x = this->BL->x;
-	Vector3d eta = this->CY->to_etacoord(iSP, BL_x);
-	double th = eta[0];
+	Matrix3d xyz2eta = this->get_xyz2eta();
 
-	Matrix3d xyz2eta = this->CY->get_xyz2eta(iSP, th);
 	Vector3d e = Vector3d(1.0, 0.0, 0.0);
 	Vector3d e_ = this->CY->to_inertialvector(e, xyz2eta);
 

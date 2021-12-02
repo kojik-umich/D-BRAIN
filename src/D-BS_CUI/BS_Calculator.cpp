@@ -192,7 +192,6 @@ void BS_Calculator::Stt_Eq1(
 ) {
 	BS_Calculator::BS.set_y0(x, stt.v0, stt.w0);
 	BS_Calculator::BS.get_F1(f);
-	std::cout << "x[0],\t" << x[0] << ",\t f[0],\t" << f[0] << ",\t x[50],\t" << x[50] << ",\t f[50],\t" << f[50] << std::endl;
 	return;
 }
 
@@ -213,7 +212,7 @@ void BS_Calculator::Stt_Eq2(
 void BS_Calculator::init_dyn(const BS_FileIn::Dynamic&dyn, int ballnum) {
 
 	// 動解析設定
-	BS_Calculator::dyn.set[0].nX = 5 * ballnum + 11;
+	BS_Calculator::dyn.set[0].nX = 4 * ballnum + 10;
 	BS_Calculator::dyn.set[1].nX = 13 * (ballnum + 2);
 
 	for (int i = 0; i < 2; i++) {
@@ -248,6 +247,10 @@ void BS_Calculator::Dyn_Eq0(int*n, double*t, double*y, double*dydt) {
 
 	BS.set_dyn_y0(y);
 	BS.get_dyn_dydt0(dydt);
+
+	//for (size_t i = 0; i < 5; i++) 
+	//	std::cout << "\t" << y[i];
+	//std::cout << std::endl;
 
 	return;
 }
@@ -285,16 +288,16 @@ void BS_Calculator::Dyn_solve(double*x0, double*t, int i) {
 	double t0 = t[0] / Rigid::t;
 	double t1 = t[1] / Rigid::t;
 
-	if (i == 0) 
+	if (i == 0)
 		dodesol(dyn.set[i].ipar, &dyn.set[i].nX, &t0, &t1, x0, &Dyn_Eq0, &Dyn_void, &dyn.set[i].h, &dyn.set[i].hmin, &dyn.set[i].ep, &dyn.set[i].tr, dyn.set[i].dpar, dyn.set[i].kd, &dyn.set[i].ierr);
 
-	else if (i == 1) 
+	else if (i == 1)
 		dodesol(dyn.set[i].ipar, &dyn.set[i].nX, &t0, &t1, x0, &Dyn_Eq1, &Dyn_void, &dyn.set[i].h, &dyn.set[i].hmin, &dyn.set[i].ep, &dyn.set[i].tr, dyn.set[i].dpar, dyn.set[i].kd, &dyn.set[i].ierr);
 
 
 	t[0] = t0 * Rigid::t;
 	t[1] = t1 * Rigid::t;
-
+	
 	return;
 }
 

@@ -111,7 +111,9 @@ public:
 	void save(BS_Out::BallCylinderPair & OUT);
 	void save_Slice(int i, int j, double farr, const Vector3d& Fs_, const Vector3d& Ts_, double mu_cl, double mu_tr, const Vector3d& us, const Vector3d& ps);
 	void init_Sliceparam(int i);
+	Matrix3d get_xyz2eta(void);
 	Vector3d get_etav0(void);
+	void set_etav0(const Vector2d & eta);
 	void write_slice(int ig, Matrix3d xyz2XYZ, BS_Out::BallCylinderPair&BRP);
 	BS_BallCylinderPair();
 	~BS_BallCylinderPair();

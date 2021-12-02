@@ -182,7 +182,7 @@ int main(int argc, char *argv[]) {
 
 	// 静解析．
 	std::cout << std::endl << "【D-BS 静解析】" << std::endl;
-	
+
 	if (!FI.runStatic)
 		std::cout << "は $$SttMode = 0 であったため行いません．" << std::endl;
 
@@ -228,13 +228,6 @@ int main(int argc, char *argv[]) {
 			calc.BS.get_dyn_y0(y);
 			sub_Dynamic(calc, FO, i, t0, y, Temp, FI.dyn.set[i].stopcalc, y_temp, FI.dyn.set[i].dTerr, FI.dyn.set[i].stp);
 			calc.BS.deinit_dyn0();
-
-			//double *x1 = new double[BS_Calculator::stt.set[1].n];
-			//calc.BS.get_y0(x1);
-			//int RCI_Request = BS_Calculator::Stt_solve(1, x1);
-			//delete[] x1;
-			//if (RCI_Request != -3)
-			//	return -1;
 		}
 		// step2.5（純転がり速度計算）．恒等式から各玉の主荷重2点での純転がり速度を求める．
 		std::cout << std::endl << "【step2.5：純転がり速度計算】" << std::endl;
@@ -268,8 +261,6 @@ int main(int argc, char *argv[]) {
 	t1[1] = BS_Calculator::dyn.set[_DYN_LAST_].t_step + t_str;
 	y_[0] = t1[0];
 	calc.BS.get_dyn_y1(y);
-
-	std::cout << "\t y[13]\t" << y[13] << "\t dydt[13]\t" << t1[1] << std::endl;
 
 	// 前回計算結果を消去し，初期状態での座標・速度をtempに出力
 	if (FI.output.deletelastout) {
@@ -346,17 +337,15 @@ int sub_Dynamic(BS_Calculator & calc, BS_FileOut&FO, int i, double*t, double*y, 
 
 		// 計算自動終了がある場合，1ステップごとに収束判定
 		if (stopcalc) {
+
 			// 収束判定を行い，指定された回数連続で基準値を下回っていた場合はループ中断
 			calc.BS.save(FO);
 			Ti1 = FO.ST_CY[0].Ts[0];
 			double dT = Ti1 - Ti0;
 			cout << "dT = " << Unit::Nm2Nmm(dT) << " [Nmm]";
-			if (abs(dT) < dTerr) {
-				cnt++;
-			}
-			else {
-				cnt = 0;
-			}
+
+			cnt = (abs(dT) < dTerr) ? cnt + 1 : 0;
+
 			std::cout << "\tcount = " << cnt;
 			if (cnt >= stp) {
 				std::cout << std::endl << "打ち切り基準値を" << stp
@@ -377,21 +366,15 @@ int sub_Dynamic(BS_Calculator & calc, BS_FileOut&FO, int i, double*t, double*y, 
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//const int i = 0;
+//double  *y = new double[BS_Calculator::dyn.set[i].nX];
+//VectorXd y_temp = VectorXd(1);
+//double t0[2];
+//t0[0] = 0;	t0[1] = BS_Calculator::dyn.set[i].t_step;
+//calc.BS.init_dyn0();
+//calc.BS.get_dyn_y0(y);
+//sub_Dynamic(calc, FO, i, t0, y, Temp, FI.dyn.set[i].stopcalc, y_temp, FI.dyn.set[i].dTerr, FI.dyn.set[i].stp);
+//calc.BS.deinit_dyn0();
 
 
 //// step2（力の釣り合い計算）．MKL "dtrnlsp_solve" を使って解く．
@@ -418,3 +401,20 @@ int sub_Dynamic(BS_Calculator & calc, BS_FileOut&FO, int i, double*t, double*y, 
 
 			//if (calc.BS.shaft_DOF() < 5)
 			//	std::cout << "完全非拘束でない場合の簡易計算は推奨されません．ねじ位置は入力拘束値と異なる変位に固定されます．" << std::endl;
+
+			//double *x1 = new double[BS_Calculator::stt.set[1].n];
+			//calc.BS.get_y0(x1);
+			//int RCI_Request = BS_Calculator::Stt_solve(1, x1);
+			//delete[] x1;
+			//if (RCI_Request != -3)
+			//	return -1;
+
+
+			//if (abs(dT) < dTerr) {
+			//	cnt++;
+			//}
+			//else {
+			//	cnt = 0;
+			//}
+
+
