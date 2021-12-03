@@ -53,7 +53,7 @@ public:
 		double	mu;			// 摩擦係数 [-]
 		double	zeta;		// 減衰比 [-]
 	} GV[2];
-	
+
 	// 出力保存用．
 	struct Save {
 		Vector3d eta;			// 螺旋位相角[rad], eta座標[m], zeta座標[m] の配列
@@ -90,13 +90,12 @@ public:
 	void link(Ball * BL, BS_Cylinder * CY, int is);
 
 	bool how_Contact(int i, const Vector2d & bl_x, Vector2d & e, double & dx);
-	int num_Contact();
+	int num_Contact(double * dx, Vector3d * p_);
 	double calc_Hertz(int ig, const Vector2d & bl_eta, const Vector2d & e, double dx, double & Rx, double & Ry, Vector2d & p, double & cos_alp, double & sin_alp, double & a, double & b, double & k, Vector2d & rho);
 	double calc_DynamicHertz(int ig, const Vector2d & bl_eta, const Vector2d & bl_etav, const Vector2d & e, double dx, double & Rx, double & Ry, Vector2d & p, double & cos_alp, double & sin_alp, double & a, double & b, Vector2d & rho);
 	void get_F0(Vector2d & Fbc, Vector3d & Fcb, Vector3d & Tcb);
 	void save_F0(int i, const Vector3d & p, double F, const Vector3d & eta, double a, const Vector2d & Fbc);
 	void get_F1(bool v, Vector2d & Fbc, Vector3d & Fcb, Vector3d & Tcb);
-	void get_F2(Vector3d & vF, Vector3d & vT);
 	void get_dyn_F0(bool direction, Vector3d & etav, Vector3d & Fbc, Vector3d & Fcb, Vector3d & Tcb);
 	void get_FT(Vector3d & Fbc, Vector3d & Tbc, Vector3d & Tcb, Vector3d & Fs, Vector3d & Ts);
 	Vector3d get_ur(const Vector3d & p);
@@ -128,6 +127,14 @@ public:
 	Vector3d get_eta0(void);
 	void set_eta0(const Vector2d&eta);
 	Vector2d get_etavector0(const Vector3d & x);
+	struct Statics {
+		Vector3d ev0;
+		Vector3d w0;
+	} stt;
+	double stt_get_v0(void);
+	Vector3d stt_get_dw0(void);
+	void stt_set_v0(double v0);
+	void stt_set_dw0(const Vector3d & w0);
 };
 
 class BS_BallShaftPair : public BS_BallCylinderPair {

@@ -18,6 +18,7 @@ public:
 	virtual void init(const std::vector<BS_In::Cylinder>& nut, double w0) = 0;
 	void allocate(const std::vector<BS_In::Cylinder>& cylinder);
 	virtual void set_y_(const Vector3d & x, const Vector3d & v, const Quaterniond & q, const Vector3d & w) = 0;
+	void set_Fall_Zero(void);
 
 	BS_Nut();
 	~BS_Nut();

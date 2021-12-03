@@ -53,7 +53,7 @@ void BS_Calculator::init_stt(const BS_FileIn::Static&stt, int ballnum) {
 	}
 	// 入力配列サイズ．
 	BS_Calculator::stt.set[0].n = ballnum * 2 + shaft_DOF;
-	BS_Calculator::stt.set[1].n = ballnum * 2 + shaft_DOF;
+	BS_Calculator::stt.set[1].n = 6; // ballnum * 2 + shaft_DOF;
 	BS_Calculator::stt.set[2].n = ballnum * 6 + shaft_DOF;
 
 	// 出力配列サイズ．= 入力サイズ
@@ -76,25 +76,14 @@ int BS_Calculator::Stt_solve
 	// ソルバの初期化．
 	_TRNSP_HANDLE_t handle;
 
-	// ここは後で設定に反映．
+	// ここは後でファイルからの設定に反映．
 	double*x_lw = new double[BS_Calculator::stt.set[i].n];
 	double*x_up = new double[BS_Calculator::stt.set[i].n];
 
 	for (int j = 0; j < BS_Calculator::stt.set[i].n; j++) {
-		x_lw[j] = -1e-4;
-		x_up[j] = 1e-4;
+		x_lw[j] = -1e-3;
+		x_up[j] = 1e-3;
 	}
-
-	//// ちょっと試す
-	////double*f0 = new double[BS_Calculator::stt.set[i].n];
-	//double*x0 = new double[BS_Calculator::stt.set[i].n];
-	//double*dx0 = new double[BS_Calculator::stt.set[i].n];
-
-	//for (int j = 0; j < BS_Calculator::stt.set[i].n; j++) {
-	//	//f0[j] = 0.0;
-	//	x0[j] = 0.0;
-	//	dx0[j] = 0.0;
-	//}
 
 	dtrnlspbc_init(&handle, &stt.set[i].n, &stt.set[i].m, x, x_lw, x_up, stt.set[i].eps, &stt.set[i].iter1, &stt.set[i].iter2, &stt.set[i].rs);
 
@@ -106,13 +95,6 @@ int BS_Calculator::Stt_solve
 	while (true) {
 
 		dtrnlspbc_solve(&handle, fvec, fjac, &RCI_Request);
-
-		//for (int j = 0; j < BS_Calculator::stt.set[i].n; j++) {
-		//	double G = x[j] - x0[j];
-		//	dx0[j] = 0.5 * dx0[j] + 0.3 * G;
-		//	x[j] = x0[j] + dx0[j];
-		//	x0[j] = x[j];
-		//}
 
 		if (RCI_Request == -1) {
 			printf("最大繰り返し数 %d を超過しました．収束に失敗したためプログラムを終了します．\n", stt.set[0].iter1);
@@ -190,8 +172,8 @@ void BS_Calculator::Stt_Eq1(
 	double *x,		// in:	[-]:	関数の引数．
 	double *f		// out:	[-]:	関数の戻り値．
 ) {
-	BS_Calculator::BS.set_y0(x, stt.v0, stt.w0);
-	BS_Calculator::BS.get_F1(f);
+	BS_Calculator::BS.set_y1(stt.i1, x);
+	BS_Calculator::BS.get_F1(stt.i1, f);
 	return;
 }
 
@@ -203,7 +185,7 @@ void BS_Calculator::Stt_Eq2(
 	double *x,		// in:	[-]:	関数の引数．
 	double *f		// out:	[-]:	関数の戻り値．
 ) {
-	BS_Calculator::BS.set_y2(x);
+	BS_Calculator::BS.set_y2(x, stt.v0, stt.w0);
 	BS_Calculator::BS.get_F2(f);
 	return;
 }
@@ -271,6 +253,7 @@ void BS_Calculator::Dyn_Eq1(int*n, double*t, double*y, double*dydt) {
 	// まず入力値から各部材の変位を更新．
 	BS.set_dyn_y1(y);
 	BS.set_load(F, T);
+
 	// 更新した変位から荷重を計算．
 	BS.get_dyn_dydt1(dydt, dvdt, dwdt);
 

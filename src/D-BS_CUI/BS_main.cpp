@@ -90,7 +90,7 @@ C言語ライブラリの使用でLNK2019エラーが出る場合はextern"C"を
 !*******************************************************************************/
 
 #define _MAX_STRING_ 256
-#define _DYN_LAST_    1
+#define _DYN_LAST_   1
 
 #include <iostream>			// cmd画面出力のため．
 #include <string.h>			// ファイル名操作のため．
@@ -188,7 +188,7 @@ int main(int argc, char *argv[]) {
 
 	else {
 		// step0（玉一様移動簡易計算）
-		std::cout << std::endl << "【step0：玉一様移動簡易計算】" << std::endl;
+		std::cout << std::endl << "【Approximate0：玉一様移動簡易計算】" << std::endl;
 		if (!FI.stt.run[0])
 			std::cout << "は入力が0であったため行いません．" << std::endl;
 
@@ -198,7 +198,7 @@ int main(int argc, char *argv[]) {
 			calc.BS.preset_y0(1e-9, 1e-12, 1e-9);
 		}
 		// step1（剛性計算）．MKL "dtrnlsp_solve" を使って解く．
-		std::cout << std::endl << "【step1：剛性計算】" << std::endl;
+		std::cout << std::endl << "【Statics0：摩擦なし剛性計算】" << std::endl;
 		if (!FI.stt.run[1])
 			std::cout << "は入力が0であったため行いません．" << std::endl;
 
@@ -214,7 +214,7 @@ int main(int argc, char *argv[]) {
 					std::cout << "収束はしませんでしたが次のSTEP1で釣り合う可能性もあるため，計算を続行します．" << std::endl;
 		}
 		// step2（摩擦計算）．MKL "dtrnlsp_solve" を使って解く．
-		std::cout << std::endl << "【step2：簡易摩擦計算】" << std::endl;
+		std::cout << std::endl << "【Dynamics0：簡易摩擦計算】" << std::endl;
 		if (!FI.stt.run[2])
 			std::cout << "は入力が0であったため行いません．" << std::endl;
 
@@ -227,30 +227,38 @@ int main(int argc, char *argv[]) {
 			calc.BS.init_dyn0();
 			calc.BS.get_dyn_y0(y);
 			sub_Dynamic(calc, FO, i, t0, y, Temp, FI.dyn.set[i].stopcalc, y_temp, FI.dyn.set[i].dTerr, FI.dyn.set[i].stp);
-			calc.BS.deinit_dyn0();
+			calc.BS.deinit_dyn0(FI.stt.v0, FI.stt.w0);
 		}
 		// step2.5（純転がり速度計算）．恒等式から各玉の主荷重2点での純転がり速度を求める．
-		std::cout << std::endl << "【step2.5：純転がり速度計算】" << std::endl;
+		std::cout << std::endl << "【Approximate1：純転がり速度計算】" << std::endl;
 		if (!FI.stt.run[3])
 			std::cout << "は入力が0であったため行いません．" << std::endl;
 
-		else
+		else {
 			calc.BS.pure_Rolling();
-
+			std::cout << "玉は全て純転がりに設定されました．" << std::endl;
+		}
 		// step3（定常状態）．恒等式から各玉の主荷重2点での純転がり速度を求める．
-		std::cout << std::endl << "【step3：定常状態計算】" << std::endl;
+		std::cout << std::endl << "【Statics1：各玉定常状態計算】" << std::endl;
 		if (!FI.stt.run[4])
 			std::cout << "は入力が0であったため行いません．" << std::endl;
 
 		else {
 			if (!FI.stt.run[3])
 				std::cout << "注意！純転がり計算をしないと収束しない危険性が高まります！設定を見直してください！" << std::endl;
-			double *x2 = new double[BS_Calculator::stt.set[2].n];
-			calc.BS.get_y2(x2);
-			int RCI_Request = BS_Calculator::Stt_solve(2, x2);
-			delete[] x2;
-			if (RCI_Request != -3)
-				return -1;
+			double *x1 = new double[BS_Calculator::stt.set[1].n];
+
+			bool has_next = true; int ib = 0;
+			while (has_next) {
+				std::cout << "玉番号:\t" << ib << ",\t";
+				has_next = calc.BS.get_y1(ib, x1);
+				BS_Calculator::stt.i1 = ib;
+				int RCI_Request = BS_Calculator::Stt_solve(1, x1);
+				//if (RCI_Request != -3)
+				//	return -1;
+				ib++;
+			}
+			delete[] x1;
 		}
 	}
 	// 動解析．

@@ -34,6 +34,16 @@ void BS_Nut::allocate(const std::vector<BS_In::Cylinder>&cylinders) {
 	return;
 }
 
+void BS_Nut::set_Fall_Zero(void) {
+
+	this->F = this->T = Vector3d::Zero();
+
+	for (int i = 0; i < this->nCY; i++)
+		this->CY[i].F = this->CY[i].T = this->CY[i].Fs = this->CY[i].Ts = Vector3d::Zero();
+	
+	return;
+}
+
 void BS_SingleNut::init(const std::vector<BS_In::Cylinder> & nut, double w0) {
 	bool v_const[3], w_const[3];
 	for (int i = 0; i < 3; i++) {

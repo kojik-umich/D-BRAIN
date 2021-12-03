@@ -39,6 +39,9 @@ public:
 	void init(const BS_In & IN, double v0, double w0, double wn);
 	void preset_y0(double dx0, double dth0, double dx1);
 	void pure_Rolling(void);
+	bool get_y1(int ib, double * y2);
+	void set_y1(int ib, const double * y1);
+	void get_F1(int ib, double * f1);
 	void lock_y0(const double * x0, const double * ax0, double v0, double w0);
 	void preset_y0_F(double dx0);
 	void preset_y0_T(double dth0);
@@ -50,12 +53,12 @@ public:
 	void get_F1(double*f1);
 
 	void get_y2(double*y0);
-	void set_y2(const double*y0);
+	void set_y2(const double * y2, double v0, double w0);
 	void get_F2(double*f2);
 
 	void set_dyn_y0(const double * y0);
 	void init_dyn0(void);
-	void deinit_dyn0(void);
+	void deinit_dyn0(double v0, double w0);
 	void get_dyn_y0(double * y0);
 	void get_dyn_dydt0(double * y);
 

@@ -68,15 +68,12 @@ void BS_Shaft::init_pos(double v0, double w0) {
 // step0（剛性計算）用のインタフェイス．
 void BS_Shaft::get_y0(double*y0) {
 
-	if (!this->x_const.y()) {
-		y0[0] = this->x.x() / Rigid::l;
-	}
+	y0[0] = this->x.x() / Rigid::l;
 	y0[1] = this->x.y() / Rigid::l;
 	y0[2] = this->x.z() / Rigid::l;
 
-	Vector3d ax = this->get_ax();
-	y0[3] = ax.y();
-	y0[4] = ax.z();
+	y0[3] = this->q.y();
+	y0[4] = this->q.z();
 
 	return;
 }
@@ -84,21 +81,24 @@ void BS_Shaft::get_y0(double*y0) {
 // step0（剛性計算）用のインタフェイス．(拘束条件は要修正)
 void BS_Shaft::set_y0(const double*y0, double v0, double w0) {
 
-	// 拘束している場合は数値の更新をしない
-	using namespace Numeric;
+	Vector3d x_now = this->x;
+	this->x = this->x_const.select(
+		x_now,
+		Vector3d(y0[0], y0[1], y0[2]) * Rigid::l
+	);
+	Vector3d q_ = this->Rx_const.select(
+		Vector3d(this->q.x(), this->q.y(), this->q.z()),
+		Vector3d(0.0, y0[3], y0[4])
+	);
+	this->q.y() = q_.y();
+	this->q.z() = q_.z();
+	this->q.normalize();
 
-	if (!this->x_const.y()) {
-		this->x = Vector3d(y0[0], y0[1], y0[2]) * Rigid::l;
-		this->set_dx();
-	}
+	Vector3d ax = this->get_ax();
+	this->v = v0 * ax;
+	this->w = w0 * ax;
+	this->set_dx();
 
-	if (!this->Rx_const.y()) {
-		Vector3d ax(sqrt(1.0 - Square(y0[3]) - Square(y0[4])), y0[3], y0[4]);
-		this->set_ax(ax);
-		this->v = v0 * ax;
-		this->w = w0 * ax;
-		this->set_dx();
-	}
 	return;
 }
 
@@ -120,19 +120,16 @@ void BS_Shaft::set_y_(const Vector3d&x, const Vector3d&v, const Quaterniond&q, c
 // step0（剛性計算）用のインタフェイス．
 void BS_Shaft::init_dyn0(void) {
 
-	this->mem.v = this->v;
-	this->mem.w = this->w;
-
 	this->v = Vector3d::Zero();
 	this->w = Vector3d::Zero();
 
 	return;
 }
 
-void BS_Shaft::deinit_dyn0(void) {
+void BS_Shaft::deinit_dyn0(double v0, double w0) {
 
-	this->v = this->mem.v;
-	this->w = this->mem.w;
+	this->v = v0 * this->get_ax();
+	this->w = w0 * this->get_ax();
 
 	return;
 }
@@ -156,9 +153,9 @@ void BS_Shaft::get_dyn_y0(double*y0) {
 void BS_Shaft::set_dyn_y0(const double*y0) {
 
 	Vector3d x_now = this->x;
-	Vector3d x = this->x_const.select(x_now, 
+	Vector3d x = this->x_const.select(x_now,
 		Vector3d(y0[0], y0[1], y0[2]) * Rigid::l);
-	Vector3d v = Vector3d(y0[3], y0[4], y0[5]) 
+	Vector3d v = Vector3d(y0[3], y0[4], y0[5])
 		* Rigid::l / Rigid::t;
 	Vector3d w = Vector3d(0, y0[8], y0[9])
 		/ Rigid::t;
@@ -248,7 +245,7 @@ Vector4d BS_Shaft::get_dqdt_(bool wy_const, bool wz_const, double tan_thy, doubl
 		Vector4d Cq = _Cq * 2;
 		double C = 2 * (qx * qy + qz * qw) +
 			(qx * qx - qy * qy - qz * qz + qw * qw) * tan_thz;
-		
+
 		// 0割りの判定（多分いらない）
 		double Cq_sq = Cq.squaredNorm();
 		if (Cq_sq < 1e-20) {
@@ -303,6 +300,15 @@ Vector3d BS_Shaft::get_dwdt_(const Vector3d&T, bool wy_const, bool wz_const, dou
 }
 
 
+void BS_Shaft::set_Fall_Zero(void) {
+
+	this->F = this->T = Vector3d::Zero();
+
+	for (int i = 0; i < this->nCY; i++)
+		this->CY[i].F = this->CY[i].T = this->CY[i].Fs = this->CY[i].Ts = Vector3d::Zero();
+
+	return;
+}
 
 BS_Shaft::BS_Shaft() {
 	this->CY = NULL;

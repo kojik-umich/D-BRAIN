@@ -28,6 +28,7 @@ public:
 		double v0;		// [m/s]:	シャフト並進速度（//axis）
 		double w0;		// [rad/s]:	シャフト回転速度（//axis）
 		double wn;		// [rad/s]:	ナット回転速度（//axis）
+		int i1;			// ステップ1用．玉番号を格納．
 	} stt;
 
 	static struct Dyn {

@@ -50,18 +50,19 @@ bool BS_BallCylinderPair::how_Contact(
 }
 
 // 接触点数を求めるメソッド．
-int BS_BallCylinderPair::num_Contact() {
+int BS_BallCylinderPair::num_Contact(double*dx, Vector3d*p_) {
 
-	Vector3d th_eta = this->CY->to_etacoord(iSP, this->BL->x);
+	Vector3d th_eta = this->get_eta();
+	double th = th_eta[0];
 	Vector2d eta = Vector2d(th_eta[1], th_eta[2]);		// 玉のη-ζ座標（螺旋座標）
 
-	Vector2d e;
-	double dx;
-
+	Vector2d e, p, r;	double rx, ry, c, s, a, b, k;
 	int nc = 0;
-	for (int i = 0; i < nGV; i++)
-		nc += int(this->how_Contact(i, eta, e, dx));
-
+	for (int i = 0; i < nGV; i++) {
+		nc += int(this->how_Contact(i, eta, e, dx[i]));
+		this->calc_Hertz(i, eta, e, dx[i], rx, ry, p, c, s, a, b, k, r);
+		p_[i] = this->CY->to_inertialcoord(iSP, Vector3d(th, p[0], p[1]));
+	}
 	return nc;
 }
 
@@ -253,26 +254,6 @@ void BS_BallCylinderPair::get_F1(
 		Fbc += Fbc_;
 		Fcb += Fcb_;
 		Tcb += this->CY->calc_Torque(p_, Fcb_);
-	}
-	return;
-}
-
-// 速度依存のない摩擦を求めるメソッド．
-void BS_BallCylinderPair::get_F2(
-	Vector3d&vF,		// out:	[Nm/s]	ナット進行方向滑り摩擦力．
-	Vector3d&vT			// out:	[Nm2/s]	滑り摩擦によるトルク（慣性座標系）．
-) {
-	vF = vT = Vector3d::Zero();
-
-	for (int iGV = 0; iGV < nGV; iGV++) {
-
-		Vector3d p = this->SV.GV[iGV].p;
-		Vector3d v = this->get_us(p);
-		double   F = this->SV.GV[iGV].F;
-		Vector3d vF_ = v * F;
-		Vector3d vT_ = this->BL->calc_Torque(p, vF_);
-		vF += vF_;
-		vT += vT_;
 	}
 	return;
 }
@@ -632,6 +613,23 @@ Vector2d BS_BallNutPair::get_etavector0(const Vector3d & x) {
 	return eta_;
 }
 
+double BS_BallNutPair::stt_get_v0(void) {
+	return this->BL->v.dot(this->stt.ev0);
+}
+
+Vector3d BS_BallNutPair::stt_get_dw0(void) {
+	return this->BL->w - this->stt.w0;
+}
+
+void BS_BallNutPair::stt_set_v0(double v0) {
+	this->BL->v = this->stt.ev0 * v0;
+	return;
+}
+
+void BS_BallNutPair::stt_set_dw0(const Vector3d&w0) {
+	this->BL->v = w0 + this->stt.w0;
+	return;
+}
 
 void BS_BallShaftPair::set_etap(const Vector2d & eta) {
 
@@ -936,4 +934,24 @@ BS_BallCylinderPair::~BS_BallCylinderPair() {
 //		vF += v * F;
 //	}
 //	return vF;
+//}
+
+//// 速度依存のない摩擦を求めるメソッド．
+//void BS_BallCylinderPair::get_F2(
+//	Vector3d&vF,		// out:	[Nm/s]	ナット進行方向滑り摩擦力．
+//	Vector3d&vT			// out:	[Nm2/s]	滑り摩擦によるトルク（慣性座標系）．
+//) {
+//	vF = vT = Vector3d::Zero();
+//
+//	for (int iGV = 0; iGV < nGV; iGV++) {
+//
+//		Vector3d p = this->SV.GV[iGV].p;
+//		Vector3d v = this->get_us(p);
+//		double   F = this->SV.GV[iGV].F;
+//		Vector3d vF_ = v * F;
+//		Vector3d vT_ = this->BL->calc_Torque(p, vF_);
+//		vF += vF_;
+//		vT += vT_;
+//	}
+//	return;
 //}

@@ -412,8 +412,8 @@ void BS_BallScrew::get_F1(double*F1) {
 
 		Vector2d Fbn, Fbs;
 		Vector3d Fnb, Fsb, Tnb, Tsb;
-		this->BNP[ib].get_F1(!is_RightHand, Fbn, Fnb, Tnb);
-		this->BSP[ib].get_F1(is_RightHand, Fbs, Fsb, Tsb);
+		this->BNP[ib].get_F1(is_RightHand, Fbn, Fnb, Tnb);
+		this->BSP[ib].get_F1(!is_RightHand, Fbs, Fsb, Tsb);
 		Vector2d Fb = Fbn + Fbs;
 		//double Fbn_ = Fbn.norm();
 		//double Fbs_ = Fbs.norm();
@@ -445,59 +445,163 @@ void BS_BallScrew::pure_Rolling(void) {
 	for (int i = 0; i < this->nP; i++) {
 
 		// 各溝での接触点数を求める．
-		int nn = this->BNP[i].num_Contact();
-		int ns = this->BSP[i].num_Contact();
-		std::cout << i << std::endl;
-		std::cout << nn << std::endl;
-		std::cout << ns << std::endl << std::endl;
-	}
-}
+		double dxn[2], dxs[2]; Vector3d pn[2], ps[2], v_guide;
+		int nn = this->BNP[i].num_Contact(dxn, pn);
+		int ns = this->BSP[i].num_Contact(dxs, ps);
 
-void BS_BallScrew::get_y2(double * y2) {
+		// 弾性接近量が大きい方を主荷重する．
+		Vector3d pn0 = (dxn[0] > dxn[1]) ? pn[0] : pn[1];
+		Vector3d ps0 = (dxs[0] > dxs[1]) ? ps[0] : ps[1];
 
-	for (int ib = 0; ib < this->nP; ib++) {
+		// 接触点数が多い方を玉進行方向とする．同じ場合は中間を取る．
+		Vector3d ev0 =
+			(nn > ns) ? this->BNP[i].get_e() :
+			(nn < ns) ? this->BSP[i].get_e() :
+			(this->BNP[i].get_e() + this->BSP[i].get_e()).normalized();
 
-		Vector3d v = this->BNP[ib].BL->v / Rigid::t * Rigid::l;
-		Vector3d w = this->BNP[ib].BL->w / Rigid::t;
+		// 玉進行方向成分で見た，各主荷重表面の符号付き速度を算出する．
+		double vn0 = this->BNP[i].CY->surface_velocity(pn0).dot(ev0);
+		double vs0 = this->BSP[i].CY->surface_velocity(ps0).dot(ev0);
 
-		for (int j = 0; j < 3; j++) {
-			y2[j + 0] = v[j];
-			y2[j + 3] = w[j];
-		}
+		double r0 = (pn0 - ps0).norm() / 2;
+		Vector3d ep0 = (pn0 - ps0) / (2 * r0);
+		Vector3d ew0 = ev0.cross(ep0).normalized();
+		double v0 = (vn0 + vs0) / 2;
+		double w0 = (v0 - vn0) / r0;
+
+		this->BNP[i].BL->v = v0 * ev0;
+		this->BNP[i].BL->w = w0 * ew0;
+
+		this->BNP[i].stt.ev0 = ev0;
+		this->BNP[i].stt.w0 = w0 * ew0;
 	}
 	return;
 }
 
-void BS_BallScrew::set_y2(const double * y2) {
+bool BS_BallScrew::get_y1(int ib, double * y1) {
+	
+	Vector3d yx = this->BNP[ib].get_eta() / Rigid::l;
+	double   yv = this->BNP[ib].stt_get_v0() * Rigid::t / Rigid::l;
+	Vector3d yw = this->BNP[ib].stt_get_dw0() * Rigid::t;
+
+	y1[0] = yx[1];
+	y1[1] = yx[2];
+	y1[2] = yv;
+	y1[3] = yw[0];
+	y1[4] = yw[1];
+	y1[5] = yw[2];
+
+	bool has_next = ib < (this->nP - 1);
+
+	return has_next;
+}
+
+void BS_BallScrew::set_y1(int ib, const double * y1) {
+
+	Vector2d x = Vector2d(y1[0], y1[1]) * Rigid::l;
+	double   v = y1[2] / Rigid::t * Rigid::l;
+	Vector3d w = Vector3d(y1[3], y1[4], y1[5])
+		/ Rigid::t;
+
+	this->BNP[ib].set_eta0(x);
+	this->BNP[ib].stt_set_v0(v);
+	this->BNP[ib].stt_set_dw0(w);
+
+	return;
+}
+
+void BS_BallScrew::get_F1(int ib, double * f1) {
+
+	Vector3d Fbn, Tbn, Tnb, Fnbs, Tnbs;
+	this->BNP[ib].get_FT(Fbn, Tbn, Tnb, Fnbs, Tnbs);
+
+	Vector3d Fbs, Tbs, Tsb, Fsbs, Tsbs;
+	this->BSP[ib].get_FT(Fbs, Tbs, Tsb, Fsbs, Tsbs);
+
+	Vector3d BL_F = Fbn + Fbs + this->BNP[ib].BL->get_mg();
+	Vector3d BL_T = Tbn + Tbs;
+
+	for (int j = 0; j < 3; j++) {
+		f1[j + 0] = BL_F[j];
+		f1[j + 3] = BL_T[j];
+	}
+	return;
+}
+
+void BS_BallScrew::get_y2(double * y2) {
+
+	this->ST.get_y0(y2);
 
 	for (int ib = 0; ib < this->nP; ib++) {
 
-		Vector3d v(y2[0], y2[1], y2[2]);
-		Vector3d w(y2[3], y2[4], y2[5]);
-		this->BNP[ib].BL->v = v * Rigid::t / Rigid::l;
-		this->BNP[ib].BL->w = w * Rigid::t;
+		int i6 = ib * 6;
+		Vector3d yx = this->BNP[ib].get_eta() / Rigid::l;
+		double   yv = this->BNP[ib].stt_get_v0() * Rigid::t / Rigid::l;
+		Vector3d yw = this->BNP[ib].stt_get_dw0() * Rigid::t;
+
+		y2[i6 + 5] = yx[1];
+		y2[i6 + 6] = yx[2];
+		y2[i6 + 7] = yv;
+		y2[i6 + 8] = yw[0];
+		y2[i6 + 9] = yw[1];
+		y2[i6 + 10] = yw[2];
+	}
+	return;
+}
+
+
+void BS_BallScrew::set_y2(const double * y2, double v0, double w0) {
+
+	this->ST.set_y0(y2, v0, w0);
+
+	for (int ib = 0; ib < this->nP; ib++) {
+
+		int i6 = ib * 6;
+		Vector2d x = Vector2d(y2[i6 + 5], y2[i6 + 6]) * Rigid::l;
+		double   v = y2[i6 + 7] / Rigid::t * Rigid::l;
+		Vector3d w = Vector3d(y2[i6 + 8], y2[i6 + 9], y2[i6 + 10])
+			/ Rigid::t;
+
+		this->BNP[ib].set_eta0(x);
+		this->BNP[ib].stt_set_v0(v);
+		this->BNP[ib].stt_set_dw0(w);
 	}
 	return;
 }
 
 void BS_BallScrew::get_F2(double * f2) {
 
-	for (int ib = 0; ib < this->nP; ib++) {
+	// 各玉の接触力を求める．
+	Vector3d ST_F = this->LD.F + this->ST.get_mg();
+	Vector3d ST_T = this->LD.T;
 
-		Vector3d vFn, vTn;
-		this->BNP[ib].get_F2(vFn, vTn);
+	for (int i = 0; i < this->nP; i++) {
 
-		Vector3d vFs, vTs;
-		this->BSP[ib].get_F2(vFs, vTs);
+		Vector3d Fbn, Tbn, Tnb, Fnbs, Tnbs;
+		this->BNP[i].get_FT(Fbn, Tbn, Tnb, Fnbs, Tnbs);
 
-		Vector3d vF = vFn + vFs;
-		Vector3d vT = vTn + vTs;
+		Vector3d Fbs, Tbs, Tsb, Fsbs, Tsbs;
+		this->BSP[i].get_FT(Fbs, Tbs, Tsb, Fsbs, Tsbs);
+		ST_F += -Fbs;	// 玉にかかる力の反作用により符号反転．
+		ST_T += Tsb;
+
+		Vector3d BL_F = Fbn + Fbs + this->BNP[i].BL->get_mg();
+		Vector3d BL_T = Tbn + Tbs;
 
 		for (int j = 0; j < 3; j++) {
-			f2[j + 0] = vF[j];
-			f2[j + 3] = vT[j];
+			f2[5 + 6 * i + j] = BL_F[j];
+			f2[8 + 6 * i + j] = BL_T[j];
 		}
 	}
+	double y2[5];
+	this->ST.get_y0(y2);
+
+	for (int i = 0; i < 3; i++)
+		f2[i] = (this->ST.x_const[i]) ? y2[i] : ST_F[i];
+
+	f2[3] = (this->ST.Rx_const[1]) ? y2[3] : ST_T[1];
+	f2[4] = (this->ST.Rx_const[2]) ? y2[4] : ST_T[2];
+
 	return;
 }
 
@@ -513,9 +617,9 @@ void BS_BallScrew::init_dyn0(void) {
 	return;
 }
 
-void BS_BallScrew::deinit_dyn0(void) {
+void BS_BallScrew::deinit_dyn0(double v0, double w0) {
 
-	this->ST.deinit_dyn0();
+	this->ST.deinit_dyn0(v0, w0);
 
 	for (int ib = 0; ib < this->nP; ib++)
 		this->BNP[ib].BL->v = this->BNP[ib].mem_BLv;
@@ -578,8 +682,8 @@ void BS_BallScrew::get_dyn_dydt0(double*dydt) {
 		int i4 = ib * 4;
 
 		Vector3d etavn, etavs, Fbn, Fbs, Fnb, Fsb, Tnb, Tsb;
-		this->BNP[ib].get_dyn_F0(!is_RightHand, etavn, Fbn, Fnb, Tnb);
-		this->BSP[ib].get_dyn_F0(is_RightHand, etavs, Fbs, Fsb, Tsb);
+		this->BNP[ib].get_dyn_F0(is_RightHand, etavn, Fbn, Fnb, Tnb);
+		this->BSP[ib].get_dyn_F0(!is_RightHand, etavs, Fbs, Fsb, Tsb);
 
 		//std::cout << "bef" << etavn << std::endl << std::endl;
 
@@ -735,11 +839,8 @@ void BS_BallScrew::get_dyn_dydt1(
 	double dwdt 	// in:	
 ) {
 	// 各玉の接触力を求める．
-	this->NT->F = this->ST.F = this->NT->T = this->ST.T = Vector3d::Zero();
-	for (int i = 0; i < this->NT->nCY; i++)
-		this->NT->CY[i].F = this->NT->CY[i].T = this->NT->CY[i].Fs = this->NT->CY[i].Ts = Vector3d::Zero();
-	for (int i = 0; i < this->ST.nCY; i++)
-		this->ST.CY[i].F = this->ST.CY[i].T = this->ST.CY[i].Fs = this->ST.CY[i].Ts = Vector3d::Zero();
+	this->NT->set_Fall_Zero();
+	this->ST.set_Fall_Zero();
 
 	for (int i = 0; i < this->nP; i++) {
 
@@ -1063,3 +1164,12 @@ BS_BallScrew::~BS_BallScrew() {
 //
 //	return;
 //}
+
+
+		//std::cout
+		//	<< i << std::endl
+		//	<< nn << std::endl
+		//	<< ns << std::endl
+		//	<< this->BNP[i].get_us(pn0) << std::endl
+		//	<< this->BSP[i].get_us(ps0) << std::endl
+		//	<< std::endl;
