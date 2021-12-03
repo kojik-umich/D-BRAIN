@@ -515,10 +515,10 @@ void BS_BallScrew::init_dyn0(void) {
 
 void BS_BallScrew::deinit_dyn0(void) {
 
+	this->ST.deinit_dyn0();
+
 	for (int ib = 0; ib < this->nP; ib++)
 		this->BNP[ib].BL->v = this->BNP[ib].mem_BLv;
-
-	this->ST.deinit_dyn0();
 
 	return;
 }
@@ -528,13 +528,16 @@ void BS_BallScrew::get_dyn_y0(double * y0) {
 	this->ST.get_dyn_y0(y0);
 
 	for (int ib = 0; ib < this->nP; ib++) {
-		int i5 = ib * 5;
-		Vector3d eta = this->BNP[ib].get_eta0();
-		y0[i5 + 11] = eta[1] / Rigid::l;
-		y0[i5 + 12] = eta[2] / Rigid::l;
-		for (int j = 0; j < 3; j++)
-			y0[i5 + 13 + j] = this->BNP[ib].BL->v[j]
+		int i4 = ib * 4;
+		Vector3d eta = this->BNP[ib].get_eta0()
+			/ Rigid::l;
+		y0[i4 + 10] = eta[1];
+		y0[i4 + 11] = eta[2];
+
+		Vector3d etav = this->BNP[ib].get_etav0()
 			/ Rigid::l * Rigid::t;
+		y0[i4 + 12] = etav[1];
+		y0[i4 + 13] = etav[2];
 	}
 	return;
 }
@@ -545,15 +548,19 @@ void BS_BallScrew::set_dyn_y0(const double*y0) {
 	this->ST.set_dyn_y0(y0);
 
 	for (int ib = 0; ib < this->nP; ib++) {
-		int i5 = ib * 5;
+		int i4 = ib * 4;
+
 		Vector2d eta = Vector2d(
-			y0[i5 + 11] * Rigid::l,
-			y0[i5 + 12] * Rigid::l
-		);
+			y0[i4 + 10], y0[i4 + 11]
+		)* Rigid::l;
+
 		this->BNP[ib].set_eta0(eta);
-		this->BNP[ib].BL->v =
-			Vector3d(y0[i5 + 13], y0[i5 + 14], y0[i5 + 15])
-			* Rigid::l / Rigid::t;
+
+		Vector2d etav = Vector2d(
+			y0[i4 + 12], y0[i4 + 13]
+		)* Rigid::l / Rigid::t;
+
+		this->BNP[ib].set_etav0(etav);
 	}
 	return;
 }
@@ -568,31 +575,51 @@ void BS_BallScrew::get_dyn_dydt0(double*dydt) {
 
 	for (int ib = 0; ib < this->nP; ib++) {
 
-		int i5 = ib * 5;
+		int i4 = ib * 4;
 
 		Vector3d etavn, etavs, Fbn, Fbs, Fnb, Fsb, Tnb, Tsb;
 		this->BNP[ib].get_dyn_F0(!is_RightHand, etavn, Fbn, Fnb, Tnb);
 		this->BSP[ib].get_dyn_F0(is_RightHand, etavs, Fbs, Fsb, Tsb);
-		Vector3d Fb = Fbn + Fbs;
 
-		for (int j = 0; j < 2; j++)
-			dydt[i5 + 11 + j] = etavn[j + 1];
+		//std::cout << "bef" << etavn << std::endl << std::endl;
 
-		for (int j = 0; j < 3; j++)
-			dydt[i5 + 13 + j] = Fb[j] * this->BNP[ib].BL->m_inv;
+		etavn = this->BNP[ib].get_etav0();
+
+		//std::cout << "aft" << etavn << std::endl << std::endl;
+
+		dydt[i4 + 10] = etavn[1] / Rigid::l * Rigid::t;
+		dydt[i4 + 11] = etavn[2] / Rigid::l * Rigid::t;
+
+		Matrix3d xyz2eta = this->BNP[ib].get_xyz2eta();
+		Vector3d aeta = this->BNP[ib].CY->to_etavector(
+			Fbn + Fbs, xyz2eta)
+			* this->BNP[ib].BL->m_inv
+			/ Rigid::l * Rigid::t * Rigid::t;
+
+		dydt[i4 + 12] = aeta[1];
+		dydt[i4 + 13] = aeta[2];
 
 		Fst += Fsb;
 		Tst += Tsb;
 	}
+	Vector3d    dxdt = this->ST.get_dxdt();
+	Vector3d    dvdt = this->ST.get_dvdt(Fst);
+	Quaterniond dqdt = this->ST.get_dqdt();
+	Vector3d    dwdt = this->ST.get_dwdt(Tst);
 
 	for (int i = 0; i < 3; i++) {
-		dydt[i + 0] = this->ST.v[i];
-		dydt[i + 3] = Fst[i] * this->ST.m_inv;
-		dydt[i + 8] = Tst[i] * this->ST.I_inv[i];
+		dydt[i + 0] = dxdt[i] / Rigid::l * Rigid::t;
+		dydt[i + 3] = dvdt[i] / Rigid::l * Rigid::t * Rigid::t;
 	}
-	for (int i = 0; i < 2; i++)
-		dydt[i + 6] = this->ST.w[i + 1];
+	dydt[6] = dqdt.y() * Rigid::t;
+	dydt[7] = dqdt.z() * Rigid::t;
+	dydt[8] = dwdt.y() * Rigid::t * Rigid::t;
+	dydt[9] = dwdt.z() * Rigid::t * Rigid::t;
 
+	//for (size_t i = 90; i < 94; i++)
+	//	std::cout << "\t" << dydt[i];
+
+	//std::cout << std::endl << std::endl;
 	return;
 }
 

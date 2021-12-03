@@ -108,7 +108,10 @@ public:
 		this->BNP.resize(ballnum);
 		this->BSP.resize(ballnum);
 		this->BBP.resize(ballnum);
-		int msmax = 21;
+
+		int msmax = IN.tribology.ellipse_mesh[0] 
+			* std::max(IN.tribology.ellipse_mesh[1], 1);
+
 		for (size_t i = 0; i < ballnum; i++) {
 			for (int j = 0; j < 2; j++) {
 				this->BNP[i].GV[j].SL = new Slice[msmax];
