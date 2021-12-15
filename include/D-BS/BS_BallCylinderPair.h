@@ -91,8 +91,8 @@ public:
 
 	bool how_Contact(int i, const Vector2d & bl_x, Vector2d & e, double & dx);
 	int num_Contact(double * dx, Vector3d * p_);
-	double calc_Hertz(int ig, const Vector2d & bl_eta, const Vector2d & e, double dx, double & Rx, double & Ry, Vector2d & p, double & cos_alp, double & sin_alp, double & a, double & b, double & k, Vector2d & rho);
-	double calc_DynamicHertz(int ig, const Vector2d & bl_eta, const Vector2d & bl_etav, const Vector2d & e, double dx, double & Rx, double & Ry, Vector2d & p, double & cos_alp, double & sin_alp, double & a, double & b, Vector2d & rho);
+	double calc_Hertz(int ig, const Vector2d & bl_eta, const Vector2d & e, double dx, double & Rx, double & Ry, Vector2d & p, double & cos_alp, double & sin_alp, double & a, double & b, double & k, Vector2d & rho, double & Pmax);
+	double calc_DynamicHertz(int ig, const Vector2d & bl_eta, const Vector2d & bl_etav, const Vector2d & e, double dx, double & Rx, double & Ry, Vector2d & p, double & cos_alp, double & sin_alp, double & a, double & b, Vector2d & rho, double & Pmax);
 	void get_F0(Vector2d & Fbc, Vector3d & Fcb, Vector3d & Tcb);
 	void save_F0(int i, const Vector3d & p, double F, const Vector3d & eta, double a, const Vector2d & Fbc);
 	void get_F1(bool v, Vector2d & Fbc, Vector3d & Fcb, Vector3d & Tcb);

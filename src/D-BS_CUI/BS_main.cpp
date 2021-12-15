@@ -170,7 +170,7 @@ int main(int argc, char *argv[]) {
 	switch (FI.initial.preset) {
 	case BS_FileIn::Initial::Preset::ReadPos:
 		std::cout << "シャフト初期位置を入力値へ移動します．" << std::endl;
-		calc.BS.lock_y0(FI.initial.x0, FI.initial.ax0, FI.stt.v0, FI.stt.w0);
+		calc.BS.lock_y0(FI.bound.x0, FI.bound.ax0, FI.stt.v0, FI.stt.w0);
 		break;
 	case BS_FileIn::Initial::Preset::ReadTemp:
 		std::cout << "tempファイルから玉・シャフトの位置・速度と現在時刻を取得します．" << std::endl;

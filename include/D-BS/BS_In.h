@@ -121,11 +121,10 @@ public:
 	} rigid;
 
 	struct Bound {
+		double x0[3];	// [m/s]:	‰Šú“ü—Í•ÏˆÊ
+		double ax0[3];	// [rad/s]:	‰Šú“ü—Íp¨D[1,tan_z,-tan_y]‚Ì\¬
 		bool v_const[3];
 		bool w_const[3];
-		double tan_thy;
-		double tan_thz;
 	} bound;
 };
-
 

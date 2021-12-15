@@ -25,8 +25,6 @@ public:
 			ReadPos		= 0,	// $$Position‚©‚ç“Ç‚İæ‚è
 			ReadTemp	= 1		// Tempƒtƒ@ƒCƒ‹‚©‚ç“Ç‚İæ‚è
 		}preset;
-		double x0[3];	// [m/s]:	‰Šú“ü—Í•ÏˆÊ
-		double ax0[3];	// [rad/s]:	‰Šú“ü—Íp¨
 	} initial;
 
 	struct Preload {

@@ -65,7 +65,7 @@ void BS_FileIn::read_input_all(const char fpath_d4bin_csv[]) {
 	has_error |= this->read_Gravity(inp_data);
 	has_error |= this->read_Bound(inp_data);
 	has_error |= this->read_PositionSet(inp_data);
-	if (this->initial.preset)
+	if (this->initial.preset == Initial::ReadPos)
 		has_error |= this->read_Position(inp_data);
 
 	has_error |= this->read_SttMode(inp_data);
@@ -657,18 +657,15 @@ bool BS_FileIn::read_Position(const vector<vector<string>>&inp_data) {
 	string param_name = "$$Position";
 	try {
 		vector<string> param = FileIn::pickup_data(param_name, inp_data);
-		this->initial.x0[0] = Unit::mm2m(stod(param[1]));
-		this->initial.x0[1] = Unit::mm2m(stod(param[2]));
-		this->initial.x0[2] = Unit::mm2m(stod(param[3]));
-		double thy = stod(param[4]);
-		double thz = stod(param[5]);
-		this->bound.tan_thy = tan(Unit::deg2rad(thy));
-		this->bound.tan_thz = tan(Unit::deg2rad(thz));
-		double norm = 1.0 + Numeric::Square(thy) + Numeric::Square(thz);
+		this->bound.x0[0] = Unit::mm2m(stod(param[1]));
+		this->bound.x0[1] = Unit::mm2m(stod(param[2]));
+		this->bound.x0[2] = Unit::mm2m(stod(param[3]));
+		double thy = Unit::deg2rad(stod(param[4]));
+		double thz = Unit::deg2rad(stod(param[5]));
 
-		this->initial.ax0[0] = 1.0 / norm;
-		this->initial.ax0[1] = -thz / norm;
-		this->initial.ax0[2] = thy / norm;
+		this->bound.ax0[0] = 1.0;
+		this->bound.ax0[1] = tan(thz);
+		this->bound.ax0[2] =-tan(thy);
 	}
 	catch (invalid_argument) {
 		return FileIn::invalid_argument_error(param_name);

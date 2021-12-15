@@ -24,7 +24,7 @@ void BS_Shaft::allocate(const std::vector<BS_In::Cylinder>&cylinders) {
 	return;
 }
 
-void BS_Shaft::init(const std::vector<BS_In::Cylinder>&cylinders, const bool(&v_const)[3], const bool(&w_const)[3], double tan_thy, double tan_thz, double v0, double w0) {
+void BS_Shaft::init(const std::vector<BS_In::Cylinder>&cylinders, const bool(&v_const)[3], const bool(&w_const)[3], const double(&ax0)[3], double v0, double w0) {
 
 	this->CY[0].init(cylinders[0], v_const, w_const);
 
@@ -35,8 +35,9 @@ void BS_Shaft::init(const std::vector<BS_In::Cylinder>&cylinders, const bool(&v_
 	this->w = this->get_ax() * w0;
 	this->v = this->get_ax() * v0;
 
-	this->tan_thy = tan_thy;
-	this->tan_thz = tan_thz;
+	Vector3d ax0_ = Vector3d(ax0) / ax0[0];		// x¬•ª‚ª1‚É‚È‚é‚æ‚¤‚Éˆê‰ž‹KŠi‰»D
+	this->tan_thy =-ax0_[2];
+	this->tan_thz = ax0_[1];
 
 	this->set_mI(cylinders[0].m, Vector3d(cylinders[0].Ix, cylinders[0].Iyz, cylinders[0].Iyz));
 

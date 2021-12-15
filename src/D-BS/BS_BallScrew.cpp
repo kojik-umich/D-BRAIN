@@ -123,7 +123,7 @@ void BS_BallScrew::init(const BS_In&IN, double v0, double w0, double wn) {
 		this->CC[i].init(IN.circuit[i]);
 
 	this->NT->init(IN.nut, wn);
-	this->ST.init(IN.shaft, IN.bound.v_const, IN.bound.w_const, IN.bound.tan_thy, IN.bound.tan_thz, v0, w0);
+	this->ST.init(IN.shaft, IN.bound.v_const, IN.bound.w_const, IN.bound.ax0, v0, w0);
 
 	for (int i = 0; i < this->nP; i++) {
 		this->BNP[i].init(IN.BallNutPair[i], IN.tribology, IN.oil);

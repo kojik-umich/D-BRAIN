@@ -56,11 +56,11 @@ int BS_BallCylinderPair::num_Contact(double*dx, Vector3d*p_) {
 	double th = th_eta[0];
 	Vector2d eta = Vector2d(th_eta[1], th_eta[2]);		// ‹Ê‚ÌƒÅ-ƒÄÀ•Wi—†ùÀ•Wj
 
-	Vector2d e, p, r;	double rx, ry, c, s, a, b, k;
+	Vector2d e, p, r;	double rx, ry, c, s, a, b, k, Pmax;
 	int nc = 0;
 	for (int i = 0; i < nGV; i++) {
 		nc += int(this->how_Contact(i, eta, e, dx[i]));
-		this->calc_Hertz(i, eta, e, dx[i], rx, ry, p, c, s, a, b, k, r);
+		this->calc_Hertz(i, eta, e, dx[i], rx, ry, p, c, s, a, b, k, r, Pmax);
 		p_[i] = this->CY->to_inertialcoord(iSP, Vector3d(th, p[0], p[1]));
 	}
 	return nc;
@@ -80,7 +80,8 @@ double BS_BallCylinderPair::calc_Hertz(
 	double&a,				// out:	[m]:	ÚG‘È‰~’·ŒaD
 	double&b,				// out:	[m]:	ÚG‘È‰~’ZŒaD
 	double&k,				// out:	[N/x^1.5]:	”ñüŒ`„«D
-	Vector2d&rho			// out:	[1/m]:	‚Ë‚¶‘¤‚Ì‹È—¦
+	Vector2d&rho,			// out:	[1/m]:	‚Ë‚¶‘¤‚Ì‹È—¦D
+	double&Pmax				// out: [N/m^2]	ÚG–Êˆ³D
 ) {
 	cos_alp = e[0];
 	sin_alp = e[1];
@@ -97,6 +98,7 @@ double BS_BallCylinderPair::calc_Hertz(
 	// “™‰¿‹È—¦”¼Œa‚©‚çÚG‘È‰~’†S‚ğ‹‚ß‚éD
 	double r0 = Numeric::EffectiveCenter(this->BL->r, -1 / rho[1], dx);
 	p = bl_eta + r0 * e;
+	Pmax = 1.5 * F_norm_ / (Numeric::pi * a * b);
 
 	return F_norm_;
 }
@@ -115,11 +117,12 @@ double BS_BallCylinderPair::calc_DynamicHertz(
 	double&sin_alp,			// out:	[-]:	ÚGŠp‚ÌsinD
 	double&a,				// out:	[m]:	ÚG‘È‰~’·ŒaD
 	double&b,				// out:	[m]:	ÚG‘È‰~’ZŒaD
-	Vector2d&rho			// out:	[1/m]:	‚Ë‚¶‘¤‚Ì‹È—¦
+	Vector2d&rho,			// out:	[1/m]:	‚Ë‚¶‘¤‚Ì‹È—¦D
+	double&Pmax				// out: [N/m^2]	ÚG–Êˆ³D
 ) {
 	// BrewHamrock ‚Ì‹ß—®‚©‚ç„«CÚG‘È‰~‚ğ‹‚ß‚éD 
 	double k;
-	double F_norm_ = this->calc_Hertz(iGV, bl_eta, e, dx, Rx, Ry, p, cos_alp, sin_alp, a, b, k, rho);
+	double F_norm_ = this->calc_Hertz(iGV, bl_eta, e, dx, Rx, Ry, p, cos_alp, sin_alp, a, b, k, rho, Pmax);
 
 	// ”ñüŒ`„«‚©‚çC”ñüŒ`ƒ_ƒ“ƒpŒW” c ‚ğZoD
 	double c = 2 * this->GV[iGV].zeta * sqrt(1.5 * this->m * k);
@@ -162,9 +165,9 @@ void BS_BallCylinderPair::get_F0(
 		bool is_contact = this->how_Contact(iGV, eta, e, dx);
 
 		if (is_contact) {
-			double Rx, Ry, cos_alp, sin_alp, b, k;
+			double Rx, Ry, cos_alp, sin_alp, b, k, Pmax;
 			Vector2d p, rho;
-			F_norm = this->calc_Hertz(iGV, eta, e, dx, Rx, Ry, p, cos_alp, sin_alp, a, b, k, rho);
+			F_norm = this->calc_Hertz(iGV, eta, e, dx, Rx, Ry, p, cos_alp, sin_alp, a, b, k, rho, Pmax);
 			Fbc_ = -e * F_norm;
 			Fcb_ = this->CY->to_inertialvector(Vector3d(0.0, -Fbc_[0], -Fbc_[1]), xyz2eta);
 			p_ = this->CY->to_inertialcoord(iSP, Vector3d(th, p[0], p[1]));
@@ -220,9 +223,9 @@ void BS_BallCylinderPair::get_F1(
 		bool is_contact = this->how_Contact(iGV, eta, e_, dx);
 
 		if (is_contact) {
-			double Rx, Ry, cos_alp, sin_alp, b, k;
+			double Rx, Ry, cos_alp, sin_alp, b, k, Pmax;
 			Vector2d p, rho;
-			F_norm = this->calc_Hertz(iGV, eta, e_, dx, Rx, Ry, p, cos_alp, sin_alp, a, b, k, rho);
+			F_norm = this->calc_Hertz(iGV, eta, e_, dx, Rx, Ry, p, cos_alp, sin_alp, a, b, k, rho, Pmax);
 			Fbc_ = -e_ * F_norm;
 
 			// ƒiƒbƒg/ƒVƒƒƒtƒg‚©‚çŒ©‚½‹Êis•ûŒü‚ÌŒü‚«‚©‚ç–€C—Í‚Ì•ûŒü‚ğŒˆ‚ß‘Å‚¿‚ÅŒvZ
@@ -290,9 +293,9 @@ void BS_BallCylinderPair::get_dyn_F0(
 		bool is_contact = this->how_Contact(iGV, eta, e_, dx);
 
 		if (is_contact) {
-			double Rx, Ry, cos_alp, sin_alp, b, k;
+			double Rx, Ry, cos_alp, sin_alp, b, k, Pmax;
 			Vector2d p, rho;
-			F_norm = this->calc_DynamicHertz(iSP, eta, etav_, e_, dx, Rx, Ry, p, cos_alp, sin_alp, a, b, rho);
+			F_norm = this->calc_DynamicHertz(iSP, eta, etav_, e_, dx, Rx, Ry, p, cos_alp, sin_alp, a, b, rho, Pmax);
 
 			Fbc_ = -e_ * F_norm;
 
@@ -349,13 +352,12 @@ void BS_BallCylinderPair::get_FT(
 		bool is_contact = this->how_Contact(iGV, eta, e, dx);
 
 		if (is_contact) {
-			F_norm = this->calc_DynamicHertz(iSP, eta, etav_, e, dx, Rx, Ry, p, cos_alp, sin_alp, a, b, rho);
+			F_norm = this->calc_DynamicHertz(iSP, eta, etav_, e, dx, Rx, Ry, p, cos_alp, sin_alp, a, b, rho, Pmax);
 			p_ = this->CY->to_inertialcoord(iSP, Vector3d(th, p[0], p[1]));
 			Fn = this->CY->to_inertialvector(
 				Vector3d(0.0, F_norm * -e[0], F_norm * -e[1]),
 				xyz2eta);
 
-			Pmax = 1.5 * F_norm / (Numeric::pi * a * b);
 			ur = this->get_ur(p_);
 			us = this->get_us(p_);
 			double ur_norm = ur.norm();

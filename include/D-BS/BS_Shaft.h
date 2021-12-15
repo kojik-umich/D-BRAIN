@@ -14,7 +14,7 @@ public:
 public:
 	void Nothing(void);	// 具象クラスであることを示すため，意味のない関数を定義する．
 	void allocate(const std::vector<BS_In::Cylinder>& cylinders);
-	void init(const std::vector<BS_In::Cylinder>& cylinders, const bool(&v_const)[3], const bool(&w_const)[3], double tan_thy, double tan_thz, double v0, double w0);
+	void init(const std::vector<BS_In::Cylinder>& cylinders, const bool(&v_const)[3], const bool(&w_const)[3], const double(&ax0)[3], double v0, double w0);
 	void init_pos(double v0, double w0);
 	void get_y0(double * y0);
 	void set_y0(const double * y0, double v0, double w0);
