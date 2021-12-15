@@ -104,6 +104,8 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)intel_ode\include;$(ProjectDir)include\CUI_Utility;$(ProjectDir)include\D-BS;$(ProjectDir)include\D-BS_CUI;$(ProjectDir)include\Mechanics;$(ProjectDir)Eigen</AdditionalIncludeDirectories>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
