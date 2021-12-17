@@ -75,17 +75,8 @@ int BS_Calculator::Stt_solve
 ) {
 	// ソルバの初期化．
 	_TRNSP_HANDLE_t handle;
-
-	// ここは後でファイルからの設定に反映．
-	double*x_lw = new double[BS_Calculator::stt.set[i].n];
-	double*x_up = new double[BS_Calculator::stt.set[i].n];
-
-	for (int j = 0; j < BS_Calculator::stt.set[i].n; j++) {
-		x_lw[j] = -1e-3;
-		x_up[j] = 1e-3;
-	}
-
-	dtrnlspbc_init(&handle, &stt.set[i].n, &stt.set[i].m, x, x_lw, x_up, stt.set[i].eps, &stt.set[i].iter1, &stt.set[i].iter2, &stt.set[i].rs);
+	
+	dtrnlsp_init(&handle, &stt.set[i].n, &stt.set[i].m, x, stt.set[i].eps, &stt.set[i].iter1, &stt.set[i].iter2, &stt.set[i].rs);
 
 	// 収束計算のループ．関数値およびヤコビアン配列の動的確保．
 	double *fvec = new double[stt.set[i].m];
@@ -94,7 +85,7 @@ int BS_Calculator::Stt_solve
 
 	while (true) {
 
-		dtrnlspbc_solve(&handle, fvec, fjac, &RCI_Request);
+		dtrnlsp_solve(&handle, fvec, fjac, &RCI_Request);
 
 		if (RCI_Request == -1) {
 			printf("最大繰り返し数 %d を超過しました．収束に失敗したためプログラムを終了します．\n", stt.set[0].iter1);
@@ -144,7 +135,7 @@ int BS_Calculator::Stt_solve
 		}
 	}
 	// ソルバのシャットダウン．
-	dtrnlspbc_delete(&handle);
+	dtrnlsp_delete(&handle);
 
 	// 配列の開放．
 	delete[] fvec, fjac;
@@ -694,3 +685,13 @@ int main(void) {
 //
 //	return RCI_Request;
 //}
+
+//	// ここは後でファイルからの設定に反映．
+//double*x_lw = new double[BS_Calculator::stt.set[i].n];
+//double*x_up = new double[BS_Calculator::stt.set[i].n];
+//
+//for (int j = 0; j < BS_Calculator::stt.set[i].n; j++) {
+//	x_lw[j] = -1e-3;
+//	x_up[j] = 1e-3;
+//}
+
