@@ -106,7 +106,8 @@
       <AdditionalIncludeDirectories>$(ProjectDir)intel_ode\include;$(ProjectDir)include\CUI_Utility;$(ProjectDir)include\D-BS;$(ProjectDir)include\D-BS_CUI;$(ProjectDir)include\Mechanics;$(ProjectDir)Eigen;C:\Git\ceres-solver\vsbuild\config;C:\Git\ceres-solver\include;C:\Git\glog\vsbuild;C:\Git\glog\src;C:\Git\glog\src\windows;C:\Git\gflags\vsbuild\include;C:\Eigen3\include\eigen3</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <PreprocessorDefinitions>NDEBUG;_USE_MATH_DEFINES;_VARIADIC_MAX=10;CERES_EXPORT_INTERNAL_SYMBOLS;GLOG_NO_ABBREVIATED_SEVERITIES;GFLAGS_IS_A_DLL=0;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DISABLE_EXTENDED_ALIGNED_STORAGE;CERES_EXPORT_INTERNAL_SYMBOLS;GLOG_NO_ABBREVIATED_SEVERITIES;GFLAGS_IS_A_DLL=0;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4018;4267;4099;4996;4800;4244;4251;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -124,7 +125,8 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)intel_ode\include;$(ProjectDir)include\CUI_Utility;$(ProjectDir)include\D-BS;$(ProjectDir)include\D-BS_CUI;$(ProjectDir)include\Mechanics;$(ProjectDir)Eigen;C:\Git\ceres-solver\vsbuild\config;C:\Git\ceres-solver\include;C:\Git\glog\vsbuild;C:\Git\glog\src;C:\Git\glog\src\windows;C:\Git\gflags\vsbuild\include;C:\Eigen3\include\eigen3</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;_USE_MATH_DEFINES;_VARIADIC_MAX=10;CERES_EXPORT_INTERNAL_SYMBOLS;GLOG_NO_ABBREVIATED_SEVERITIES;GFLAGS_IS_A_DLL=0;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DISABLE_EXTENDED_ALIGNED_STORAGE;CERES_EXPORT_INTERNAL_SYMBOLS;GLOG_NO_ABBREVIATED_SEVERITIES;GFLAGS_IS_A_DLL=0;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4018;4267;4099;4996;4800;4244;4251;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -140,7 +142,8 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)intel_ode\include;$(ProjectDir)include\CUI_Utility;$(ProjectDir)include\D-BS;$(ProjectDir)include\D-BS_CUI;$(ProjectDir)include\Mechanics;$(ProjectDir)Eigen;C:\Git\ceres-solver\vsbuild\config;C:\Git\ceres-solver\include;C:\Git\glog\vsbuild;C:\Git\glog\src;C:\Git\glog\src\windows;C:\Git\gflags\vsbuild\include;C:\Eigen3\include\eigen3</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;_USE_MATH_DEFINES;_VARIADIC_MAX=10;CERES_EXPORT_INTERNAL_SYMBOLS;GLOG_NO_ABBREVIATED_SEVERITIES;GFLAGS_IS_A_DLL=0;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DISABLE_EXTENDED_ALIGNED_STORAGE;CERES_EXPORT_INTERNAL_SYMBOLS;GLOG_NO_ABBREVIATED_SEVERITIES;GFLAGS_IS_A_DLL=0;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4018;4267;4099;4996;4800;4244;4251;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -156,7 +159,8 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)intel_ode\include;$(ProjectDir)include\CUI_Utility;$(ProjectDir)include\D-BS;$(ProjectDir)include\D-BS_CUI;$(ProjectDir)include\Mechanics;$(ProjectDir)Eigen;C:\Git\ceres-solver\vsbuild\config;C:\Git\ceres-solver\include;C:\Git\glog\vsbuild;C:\Git\glog\src;C:\Git\glog\src\windows;C:\Git\gflags\vsbuild\include;C:\Eigen3\include\eigen3</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;_USE_MATH_DEFINES;_VARIADIC_MAX=10;CERES_EXPORT_INTERNAL_SYMBOLS;GLOG_NO_ABBREVIATED_SEVERITIES;GFLAGS_IS_A_DLL=0;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DISABLE_EXTENDED_ALIGNED_STORAGE;CERES_EXPORT_INTERNAL_SYMBOLS;GLOG_NO_ABBREVIATED_SEVERITIES;GFLAGS_IS_A_DLL=0;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4018;4267;4099;4996;4800;4244;4251;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

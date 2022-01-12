@@ -15,6 +15,8 @@ public:
 	virtual ~BS_CostFunctor() = default;
 
 	bool operator()(double const* const* parameters, double* residual) const {
+		BS_->setPosition(parameters[0]);
+		BS_->getForce(residual);
 		return true;
 	}
 

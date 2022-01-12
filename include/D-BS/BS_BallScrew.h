@@ -70,7 +70,6 @@ public:
 	void set_load(double *F, double *T);
 	BS_BallScrew();
 	~BS_BallScrew();
-	//virtual ~BS_BallScrew() = default;
 
 
 
@@ -91,8 +90,6 @@ private:
 	double x1;
 
 public:
-
-	//BS_BallScrew& operator=(BS_BallScrew&& o) = default;
 
 	void getPosition(std::vector<double>& x) const {
 		x[0] = this->x0;

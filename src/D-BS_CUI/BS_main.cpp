@@ -1,9 +1,10 @@
-﻿#include <cmath>
+﻿#include "BS_BallScrew.h"
+#include "BS_CostFunctor.h"
+
+#include <cmath>
 #include <iostream>
 #include <vector>
 #include <ceres/ceres.h>
-#include "BS_BallScrew.h"
-#include "BS_CostFunctor.h"
 
 void printXF(std::shared_ptr<BS_BallScrew> SS);
 
