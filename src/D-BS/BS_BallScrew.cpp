@@ -938,6 +938,9 @@ void BS_BallScrew::save(BS_Out&OUT) {
 }
 
 BS_BallScrew::BS_BallScrew() {
+	this->x0 = -2;
+	this->x1 = -1;
+
 	this->CC = NULL;
 	this->BBP = NULL;
 	this->BNP = NULL;
@@ -957,7 +960,6 @@ BS_BallScrew::~BS_BallScrew() {
 		delete[] this->BSP;
 	return;
 }
-
 
 
 

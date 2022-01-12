@@ -1,4 +1,56 @@
-﻿/*******************************************************************************
+﻿#include <cmath>
+#include <iostream>
+#include <vector>
+#include <ceres/ceres.h>
+#include "BS_BallScrew.h"
+#include "BS_CostFunctor.h"
+
+void printXF(std::shared_ptr<BS_BallScrew> SS);
+
+int main(int argc, char** argv) {
+
+	auto SS = std::make_shared<BS_BallScrew>();
+
+	const int n = 1 + 1;
+	std::vector<double> x(n);
+	SS->getPosition(x);
+	printXF(SS);
+
+	ceres::NumericDiffOptions diffoptions;
+	diffoptions.relative_step_size = 1e-9;
+
+	auto cost = BS_CostFunctor::Create(SS, diffoptions);
+
+	ceres::Problem problem;
+	problem.AddResidualBlock(cost, NULL, x.data());
+
+	ceres::Solver::Options options;
+	options.max_num_iterations = 100;
+	options.linear_solver_type = ceres::DENSE_QR;
+	options.minimizer_progress_to_stdout = true;
+	ceres::Solver::Summary summary;
+	ceres::Solve(options, &problem, &summary);
+
+	std::cout << summary.FullReport() << "\n";
+
+	printXF(SS);
+
+	return 0;
+}
+
+void printXF(std::shared_ptr<BS_BallScrew> SS) {
+	std::vector<double> x(2);
+	SS->getPosition(x);
+	std::cout << "x =\t" << x[0] << ",\t" << x[1] << "\n";
+
+	SS->getForce(x.data());
+	std::cout << "F =\t" << x[0] << ",\t" << x[1] << "\n\n";
+}
+
+
+
+
+/*******************************************************************************
 "BS_main.cpp"
 2018/12/05	[Core-T]	楠崎
 
@@ -89,6 +141,7 @@ C言語ライブラリの使用でLNK2019エラーが出る場合はextern"C"を
 
 !*******************************************************************************/
 
+/*
 #define _MAX_STRING_ 256
 #define _DYN_LAST_   1
 
@@ -425,4 +478,4 @@ int sub_Dynamic(BS_Calculator & calc, BS_FileOut&FO, int i, double*t, double*y, 
 			//	cnt = 0;
 			//}
 
-
+*/

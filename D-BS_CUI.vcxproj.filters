@@ -54,5 +54,8 @@
     <ClInclude Include="include\D-BS_CUI\BS_SimulinkIn.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\D-BS_CUI\BS_CostFunctor.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
