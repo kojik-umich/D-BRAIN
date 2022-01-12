@@ -221,10 +221,6 @@ void BS_Calculator::Dyn_Eq0(int*n, double*t, double*y, double*dydt) {
 	BS.set_dyn_y0(y);
 	BS.get_dyn_dydt0(dydt);
 
-	//for (size_t i = 0; i < 5; i++) 
-	//	std::cout << "\t" << y[i];
-	//std::cout << std::endl;
-
 	return;
 }
 
