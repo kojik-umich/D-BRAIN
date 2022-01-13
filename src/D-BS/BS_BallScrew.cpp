@@ -349,7 +349,7 @@ void BS_BallScrew::get_y0(double*y0) {
 
 // step0（剛性計算）：変数y0を入力
 void BS_BallScrew::set_y0(
-	const double*y0,	// in :[-]		: 変数y0
+	double const* const y0,	// in :[-]		: 変数y0
 	double v0,			// in :[m/s]	: シャフト進行速度
 	double w0			// in :[rad/s]	: シャフト回転速度
 ) {
@@ -938,9 +938,6 @@ void BS_BallScrew::save(BS_Out&OUT) {
 }
 
 BS_BallScrew::BS_BallScrew() {
-	this->x0 = -2;
-	this->x1 = -1;
-
 	this->CC = NULL;
 	this->BBP = NULL;
 	this->BNP = NULL;

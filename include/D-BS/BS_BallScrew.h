@@ -47,7 +47,7 @@ public:
 	void preset_y0_T(double dth0);
 	void preset_y0_x(double dx);
 	void get_y0(double*y0);
-	void set_y0(const double * y0, double v0, double w0);
+	void set_y0(double const* const y0, double v0, double w0);
 	void get_F0(double*f0);
 
 	void get_F1(double*f1);
@@ -70,45 +70,6 @@ public:
 	void set_load(double *F, double *T);
 	BS_BallScrew();
 	~BS_BallScrew();
-
-
-
-private:
-	static double Hertz(double k, double dx) {
-		return k * (
-			(dx > 0)
-			? std::pow(dx, 1.5)
-			: std::pow(-dx, 1.5) * -1e-4
-			);
-	};
-	const double k0 = 1.0;
-	const double k1 = 2.0;
-	const double k2 = 4.0;
-	const double F0 = 1.0;
-
-	double x0;
-	double x1;
-
-public:
-
-	void getPosition(std::vector<double>& x) const {
-		x[0] = this->x0;
-		x[1] = this->x1;
-	};
-
-	void setPosition(double const* const x) {
-		this->x0 = x[0];
-		this->x1 = x[1];
-	};
-
-	void getForce(double * F) {
-		double dx0 = this->x0;
-		double dx1 = this->x0 - this->x1;
-		double dx2 = this->x1;
-
-		F[0] = -Hertz(this->k0, dx0) - Hertz(this->k1, dx1) + this->F0;
-		F[1] = Hertz(this->k1, dx1) - Hertz(this->k2, dx2);
-	};
 };
 
 

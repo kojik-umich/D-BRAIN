@@ -1,26 +1,94 @@
-﻿#include "BS_BallScrew.h"
+﻿#define _MAX_STRING_ 256
+#define _DYN_LAST_   1
+
+#include "BS_BallScrew.h"
 #include "BS_CostFunctor.h"
+#include "BS_FileIn.h"
+#include "BS_FileOut.h"
+#include "BS_Calculator.h"
+#include "BS_BallScrew.h"
+#include "Rigid.h"
+#include "LicenceSimple.h"
 
 #include <cmath>
-#include <iostream>
 #include <vector>
 #include <ceres/ceres.h>
+#include <iostream>			// cmd画面出力のため．
+#include <string.h>			// ファイル名操作のため．
+#include <string>			// ファイル名操作のため．
+#include <conio.h>			// Enterキー入力でプログラム実行を止めるため．
+#include <chrono>			// 実行時間計測のため．
+#include <Eigen\Dense>		// Tempファイル出力のため．
 
-void printXF(std::shared_ptr<BS_BallScrew> SS);
+using Eigen::VectorXd;		// Tempファイル出力のため．
 
 int main(int argc, char** argv) {
 
-	auto SS = std::make_shared<BS_BallScrew>();
+	// タイトル表示．
+	printf("       ---------------------------------------------------\n");
+	printf("\n");
+	printf("            DYNAMIC BEARING ANALYSIS IN NSK (D-BRAIN)\n");
+	printf("\n");
+	printf("              D-BS    : %s (Build Date)\n", __DATE__);
+	printf("\n");
+	printf("            Dynamic motion analysis of Ball Screw \n");
+	printf("\n");
+	printf("       ---------------------------------------------------\n");
 
-	const int n = 1 + 1;
+	if (!LicenceSimple::hasTime(2023, 5, 1))
+		return -1;
+
+	char fpath_dbsin_csv[_MAX_STRING_];
+	if (argc < 2) {
+		std::cout << "インプットファイルの名前を入力してください" << std::endl;
+		cin >> fpath_dbsin_csv;
+	}
+	else
+		sprintf_s(fpath_dbsin_csv, _MAX_STRING_, argv[1]);
+
+	BS_FileIn FI;
+
+	//CSVファイルから数値を読み込み，FIの各メンバ変数に書き込む
+	try {
+		FI.read_input_all(fpath_dbsin_csv);
+	}
+	catch (exception&e) {
+		std::cout << e.what() << std::endl;
+		std::cout << "inputファイル読み取り時にエラーが発生したため強制終了します．" << std::endl;
+		return -1;
+	}
+
+	// 世界全体の単位系の統一．
+	Rigid::l = FI.rigid.l;
+	Rigid::t = FI.rigid.t;
+	Rigid::g = Vector3d(FI.rigid.g);
+
+	// ボールねじオブジェクトの初期化．
+	auto BS = std::shared_ptr<BS_BallScrew>(new BS_BallScrew());
+
+	BS->allocate(FI);
+	BS->init(FI, FI.stt.v0, FI.stt.w0, FI.stt.wn);
+
+	//// 出力形式について初期化．
+	BS_FileOut FO;
+	FO.init(FI);
+	BS_Calculator::init_stt(FI.stt, FI.ballnum);
+	BS_Calculator::init_dyn(FI.dyn, FI.ballnum);
+	
+	BS->lock_y0(FI.bound.x0, FI.bound.ax0, FI.stt.v0, FI.stt.w0);
+
+	std::cout << "おおよその位置へシャフトを移動します．" << std::endl;
+	BS->preset_y0(1e-9, 1e-12, 1e-9);
+
+	// Ceres-Solver
+	const int n = BS_Calculator::stt.set[0].n;
 	std::vector<double> x(n);
-	SS->getPosition(x);
-	printXF(SS);
+	BS->get_y0(x.data());
 
 	ceres::NumericDiffOptions diffoptions;
 	diffoptions.relative_step_size = 1e-9;
 
-	auto cost = BS_CostFunctor::Create(SS, diffoptions);
+	auto cost = BS_CostFunctor::Create(BS, FI.stt.v0, FI.stt.w0, n, diffoptions);
 
 	ceres::Problem problem;
 	problem.AddResidualBlock(cost, NULL, x.data());
@@ -34,20 +102,8 @@ int main(int argc, char** argv) {
 
 	std::cout << summary.FullReport() << "\n";
 
-	printXF(SS);
-
 	return 0;
 }
-
-void printXF(std::shared_ptr<BS_BallScrew> SS) {
-	std::vector<double> x(2);
-	SS->getPosition(x);
-	std::cout << "x =\t" << x[0] << ",\t" << x[1] << "\n";
-
-	SS->getForce(x.data());
-	std::cout << "F =\t" << x[0] << ",\t" << x[1] << "\n\n";
-}
-
 
 
 
