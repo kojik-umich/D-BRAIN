@@ -20,7 +20,8 @@
 #include "BS_Calculator.h"
 
 // このオブジェクト内でのグローバル変数的役割．
-BS_BallScrew BS_Calculator::BS = BS_BallScrew();
+//BS_BallScrew BS_Calculator::BS = BS_BallScrew();
+std::shared_ptr<BS_BallScrew> BS_Calculator::BS;
 BS_Calculator::Stt BS_Calculator::stt;
 BS_Calculator::Dyn BS_Calculator::dyn;
 
@@ -151,8 +152,8 @@ void BS_Calculator::Stt_Eq0(
 	double *x,		// in:	[-]:	関数の引数．
 	double *f		// out:	[-]:	関数の戻り値．
 ) {
-	BS_Calculator::BS.set_y0(x, stt.v0, stt.w0);
-	BS_Calculator::BS.get_F0(f);
+	BS_Calculator::BS->set_y0(x, stt.v0, stt.w0);
+	BS_Calculator::BS->get_F0(f);
 	return;
 }
 
@@ -163,8 +164,8 @@ void BS_Calculator::Stt_Eq1(
 	double *x,		// in:	[-]:	関数の引数．
 	double *f		// out:	[-]:	関数の戻り値．
 ) {
-	BS_Calculator::BS.set_y1(stt.i1, x);
-	BS_Calculator::BS.get_F1(stt.i1, f);
+	BS_Calculator::BS->set_y1(stt.i1, x);
+	BS_Calculator::BS->get_F1(stt.i1, f);
 	return;
 }
 
@@ -176,8 +177,8 @@ void BS_Calculator::Stt_Eq2(
 	double *x,		// in:	[-]:	関数の引数．
 	double *f		// out:	[-]:	関数の戻り値．
 ) {
-	BS_Calculator::BS.set_y2(x, stt.v0, stt.w0);
-	BS_Calculator::BS.get_F2(f);
+	BS_Calculator::BS->set_y2(x, stt.v0, stt.w0);
+	BS_Calculator::BS->get_F2(f);
 	return;
 }
 
@@ -218,8 +219,8 @@ void BS_Calculator::init_dyn(const BS_FileIn::Dynamic&dyn, int ballnum) {
 // intel_odeライブラリの書式に準じているため，詳細はそちらのマニュアル参照．
 void BS_Calculator::Dyn_Eq0(int*n, double*t, double*y, double*dydt) {
 
-	BS.set_dyn_y0(y);
-	BS.get_dyn_dydt0(dydt);
+	BS->set_dyn_y0(y);
+	BS->get_dyn_dydt0(dydt);
 
 	return;
 }
@@ -238,11 +239,11 @@ void BS_Calculator::Dyn_Eq1(int*n, double*t, double*y, double*dydt) {
 	dvdt = BS_Calculator::get_dvdt(t0, dyn.vxt);
 
 	// まず入力値から各部材の変位を更新．
-	BS.set_dyn_y1(y);
-	BS.set_load(F, T);
+	BS->set_dyn_y1(y);
+	BS->set_load(F, T);
 
 	// 更新した変位から荷重を計算．
-	BS.get_dyn_dydt1(dydt, dvdt, dwdt);
+	BS->get_dyn_dydt1(dydt, dvdt, dwdt);
 
 	return;
 }

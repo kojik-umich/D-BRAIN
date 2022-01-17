@@ -412,17 +412,13 @@ void BS_BallScrew::get_F1(double*F1) {
 
 		Vector2d Fbn, Fbs;
 		Vector3d Fnb, Fsb, Tnb, Tsb;
-		this->BNP[ib].get_F1(is_RightHand, Fbn, Fnb, Tnb);
-		this->BSP[ib].get_F1(!is_RightHand, Fbs, Fsb, Tsb);
+		this->BNP[ib].get_F1(!is_RightHand, Fbn, Fnb, Tnb);
+		this->BSP[ib].get_F1(is_RightHand, Fbs, Fsb, Tsb);
 		Vector2d Fb = Fbn + Fbs;
-		//double Fbn_ = Fbn.norm();
-		//double Fbs_ = Fbs.norm();
-
-		//double sin_th = (Fbn[1] * Fbs[0] - Fbn[0] * Fbs[1]) / (Fbn_ * Fbs_);
 
 		int i2 = ib * 2;
-		F1[i2 + 5] = Fb[0]; // Fbn_ - Fbs_;
-		F1[i2 + 6] = Fb[1]; // sin_th * sqrt(Fbn_ * Fbs_);
+		F1[i2 + 5] = Fb[0];
+		F1[i2 + 6] = Fb[1];
 
 		Fs += Fsb;
 		Ts += Tsb;
@@ -474,12 +470,17 @@ void BS_BallScrew::pure_Rolling(void) {
 
 		this->BNP[i].stt.ev0 = ev0;
 		this->BNP[i].stt.w0 = w0 * ew0;
+
+		if (i % 10 == 0)
+			std::cout << i << ",\tnn = "
+			<< nn << ",\tns = "
+			<< ns << std::endl;
 	}
 	return;
 }
 
 bool BS_BallScrew::get_y1(int ib, double * y1) {
-	
+
 	Vector3d yx = this->BNP[ib].get_eta() / Rigid::l;
 	double   yv = this->BNP[ib].stt_get_v0() * Rigid::t / Rigid::l;
 	Vector3d yw = this->BNP[ib].stt_get_dw0() * Rigid::t;

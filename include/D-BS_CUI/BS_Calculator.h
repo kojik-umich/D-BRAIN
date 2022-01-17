@@ -12,7 +12,8 @@ class BS_Calculator {
 public:
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 public:
-	static BS_BallScrew BS;
+	//static BS_BallScrew BS;
+	static std::shared_ptr<BS_BallScrew> BS;
 
 	// 静解析のために必要なグローバル変数パラメタ群．MKLでは関数の形が決まっているため，このような形で値を受け渡す．
 	static struct Stt {

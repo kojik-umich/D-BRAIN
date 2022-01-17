@@ -629,7 +629,7 @@ void BS_BallNutPair::stt_set_v0(double v0) {
 }
 
 void BS_BallNutPair::stt_set_dw0(const Vector3d&w0) {
-	this->BL->v = w0 + this->stt.w0;
+	this->BL->w = w0 + this->stt.w0;
 	return;
 }
 
