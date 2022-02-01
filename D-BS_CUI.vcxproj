@@ -72,28 +72,30 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LibraryPath>$(ICLibDir);$(ICInstallDir)mkl\lib\ia32_win;$(ProjectDir)intel_ode\lib\ia32;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86;$(oneMKLLibDir);$(oneMKLOmpLibDir)</LibraryPath>
+    <LibraryPath>$(oneMKLLibDir);$(ICLibDir);$(ICInstallDir)mkl\lib\ia32_win;$(ProjectDir)intel_ode\lib\ia32;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86;$(oneMKLLibDir);$(oneMKLOmpLibDir)</LibraryPath>
     <OutDir>$(ProjectDir)out\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)out\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(ICPP_COMPILER18)mkl\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(oneMKLIncludeDir)</IncludePath>
+    <IncludePath>$(ICPP_COMPILER18)mkl\include;$(VC_IncludePath);$(oneMKLIncludeDir);$(WindowsSDK_IncludePath);$(oneMKLIncludeDir)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LibraryPath>$(ICLibDir);$(ICInstallDir)mkl\lib\ia32_win;$(ProjectDir)intel_ode\lib\ia32;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86;$(oneMKLLibDir);$(oneMKLOmpLibDir)</LibraryPath>
+    <LibraryPath>$(oneMKLLibDir);$(ICLibDir);$(ICInstallDir)mkl\lib\ia32_win;$(ProjectDir)intel_ode\lib\ia32;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86;$(oneMKLLibDir);$(oneMKLOmpLibDir)</LibraryPath>
     <OutDir>$(ProjectDir)out\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)out\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(ICPP_COMPILER18)mkl\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(oneMKLIncludeDir)</IncludePath>
+    <IncludePath>$(ICPP_COMPILER18)mkl\include;$(VC_IncludePath);$(oneMKLIncludeDir);$(WindowsSDK_IncludePath);$(oneMKLIncludeDir)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(ProjectDir)out\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)out\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(ICPP_COMPILER18)mkl\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>$(ICLibDir);$(ICInstallDir)mkl\lib\intel64_win;$(ProjectDir)intel_ode\lib\intel64;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
+    <IncludePath>$(ICPP_COMPILER18)mkl\include;$(VC_IncludePath);$(oneMKLIncludeDir);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(oneMKLLibDir);$(ICLibDir);$(ICInstallDir)mkl\lib\intel64_win;$(ProjectDir)intel_ode\lib\intel64;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
+    <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(ProjectDir)out\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)out\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(ICPP_COMPILER18)mkl\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>$(ICLibDir);$(ICInstallDir)mkl\lib\intel64_win;$(ProjectDir)intel_ode\lib\intel64;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
+    <IncludePath>$(ICPP_COMPILER18)mkl\include;$(VC_IncludePath);$(oneMKLIncludeDir);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(oneMKLLibDir);$(ICLibDir);$(ICInstallDir)mkl\lib\intel64_win;$(ProjectDir)intel_ode\lib\intel64;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
+    <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
