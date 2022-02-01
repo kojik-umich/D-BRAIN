@@ -10,7 +10,7 @@ private:
 		return k * (
 			(dx > 0)
 			? std::pow(dx, 1.5)
-			: std::pow(-dx, 1.5) * -1e-4
+			: std::pow(-dx, 1.5) * 0e-4
 			);
 	};
 	const double k0 = 1.0;
@@ -23,8 +23,8 @@ private:
 
 public:
 	SpringSystem() {
-		this->x0 = -2;
-		this->x1 = -1;
+		this->x0 = 0;
+		this->x1 = 0;
 	};
 
 	virtual ~SpringSystem() = default;
@@ -50,19 +50,24 @@ public:
 	};
 };
 
-struct SpringSystemCost {
+struct SpringSystemCost : public ceres::CostFunction {
 
 private:
 	std::shared_ptr<SpringSystem> SS_;
 
 public:
-	explicit SpringSystemCost(std::shared_ptr<SpringSystem> SS) : SS_(SS) {
+	explicit SpringSystemCost(std::shared_ptr<SpringSystem> SS)
+		: SS_(SS) {
 	}
-	virtual ~SpringSystemCost() = default;
 
-	bool operator()(double const* const* parameters, double* residual) const {
+	bool Evaluate(
+		double const* const* parameters,
+		double* residuals,
+		double** jacobians) const {
+
 		SS_->setPosition(parameters[0]);
-		SS_->getForce(residual);
+		SS_->getForce(residuals);
+
 		return true;
 	}
 

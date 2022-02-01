@@ -41,6 +41,7 @@ C:\Git\gflags\vsbuild\lib\Release\gflags_static.lib
 
 Put `glog.dll` in a directory with a path. I put it in the same directory as `.exe`.
 
+```console
 NDEBUG
 _USE_MATH_DEFINES
 _VARIADIC_MAX=10
@@ -48,6 +49,7 @@ CERES_EXPORT_INTERNAL_SYMBOLS
 GLOG_NO_ABBREVIATED_SEVERITIES
 GFLAGS_IS_A_DLL=0
 CMAKE_INTDIR="Release"
+```
 
 #### Ignore the specified warning
 
