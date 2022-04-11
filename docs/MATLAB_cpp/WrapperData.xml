@@ -1,0 +1,549 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MF0 version="1.1" packageUris="http://schema.mathworks.com/mf0/cxxfe_ast/R2021a http://schema.mathworks.com/mf0/cxxfe_ast_annotations/20180710">
+  <cxxfe.ast.Project type="cxxfe.ast.Project" uuid="dc2d6f27-24d4-461a-a2cd-cb3405d90a31">
+    <Compilations type="cxxfe.ast.source.CompilationUnit" uuid="ea2b1c5f-07dd-4eeb-9c97-a208a2973b71">
+      <Files type="cxxfe.ast.source.SourceFile" uuid="85834777-4858-4469-8ec5-77728cde8941"/>
+      <Language>CXX</Language>
+      <Annotations type="mwAnnotation.AbsolutePathBuildInfo" uuid="dad4f0a7-c4c6-4631-993a-2acc58fba82f">
+        <classArrays>clib.array.Wrapper.Simulink</classArrays>
+        <headers>C:\Users\kojik\Documents\GitHub\D-BRAIN\docs\MATLAB_cpp\include\BS_Simulink.h</headers>
+        <libraries>out\x64_Release\Wrapper\Wrapper.lib</libraries>
+        <location>C:\Users\kojik\Documents\GitHub\D-BRAIN\docs\MATLAB_cpp</location>
+        <libData type="mwAnnotation.LibraryAnnotation" uuid="a2331747-3a8d-4eeb-a3a3-0f59b9d642b5">
+          <architecture>win64</architecture>
+          <matlabVersion>R2021a</matlabVersion>
+          <packageName>Wrapper</packageName>
+        </libData>
+      </Annotations>
+      <Constants type="cxxfe.ast.constants.TemplateParamConstant" uuid="39717aba-4da0-4946-ae6b-c6723f79dd3f">
+        <Name>N</Name>
+        <Type type="cxxfe.ast.types.TemplateParamType" uuid="2eb0a4f7-423a-4049-bf10-c961477ebde1"/>
+      </Constants>
+      <Constants type="cxxfe.ast.constants.TemplateParamConstant" uuid="ad268ecb-4fcd-44b2-a842-be917e7a3c54">
+        <Name>N</Name>
+        <Type type="cxxfe.ast.types.TemplateParamType" uuid="d9859095-12b6-4b0e-b58a-bcd7ee2c8529"/>
+      </Constants>
+      <Namespaces type="cxxfe.ast.Namespace" uuid="398f1a7c-96b3-4b51-9e6a-26b955be761d">
+        <IsStd>true</IsStd>
+        <Name>std</Name>
+        <Symbols type="cxxfe.ast.types.TypedefType" uuid="377c66cc-24c2-4c1b-accd-3792df89340c">
+          <Type type="cxxfe.ast.types.NullPtrType" uuid="6ea8e2af-702e-4214-881c-936a42c0dc06"/>
+          <Name>nullptr_t</Name>
+        </Symbols>
+      </Namespaces>
+      <Namespaces type="cxxfe.ast.Namespace" uuid="d106a69e-17b4-4b17-91f8-7848b3959d74">
+        <Name>__cxxabiv1</Name>
+        <Annotations type="mwAnnotation.ScopeAnnotation" uuid="ee5b0add-b9a1-4089-b3d0-26d5231e379b">
+          <integrationStatus type="mwAnnotation.IntegrationStatus" uuid="0bf8fd2c-404c-43e5-a437-4391dcf722c6">
+            <definitionStatus>Unsupported</definitionStatus>
+          </integrationStatus>
+        </Annotations>
+      </Namespaces>
+      <Symbols type="cxxfe.ast.types.NullPtrType" uuid="6ea8e2af-702e-4214-881c-936a42c0dc06">
+        <Name>nullptr</Name>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.ClassType" uuid="8b172b5e-11bc-4120-be4a-62c589d5f9b0">
+        <Annotations type="mwAnnotation.ClassAnnotation" uuid="95f720f7-9629-4391-8212-fe9dedb064e5">
+          <integrationStatus type="mwAnnotation.IntegrationStatus" uuid="e5f281c4-209a-4b40-b2f7-131a3d251b30">
+            <definitionStatus>Inaccessible</definitionStatus>
+          </integrationStatus>
+        </Annotations>
+        <Linkage>ExternalCXX</Linkage>
+        <NeedsImplicitConstructor>true</NeedsImplicitConstructor>
+        <NeedsImplicitCopyConstructor>true</NeedsImplicitCopyConstructor>
+        <IsIncomplete>true</IsIncomplete>
+        <Name>type_info</Name>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.StructType" uuid="6411901a-7fa1-4b8a-ab0e-ccb2d11d337c">
+        <Annotations type="mwAnnotation.ClassAnnotation" uuid="bfa76788-bcdf-4c2c-a66f-854b7a1dc374">
+          <integrationStatus type="mwAnnotation.IntegrationStatus" uuid="3de95bdc-bbd5-4e65-8c37-435319e2c5b1">
+            <definitionStatus>Inaccessible</definitionStatus>
+          </integrationStatus>
+        </Annotations>
+        <Linkage>ExternalCXX</Linkage>
+        <NeedsImplicitConstructor>true</NeedsImplicitConstructor>
+        <NeedsImplicitCopyConstructor>true</NeedsImplicitCopyConstructor>
+        <IsIncomplete>true</IsIncomplete>
+        <Name>_GUID</Name>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.FloatType" uuid="3d34c024-43d8-4366-8a97-2ad7bbe94a81">
+        <Kind>LongDouble</Kind>
+        <NumBits>64</NumBits>
+        <Name>long double</Name>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.TypedefType" uuid="de2d1ed5-2672-4f51-8e66-69096eda569b">
+        <Type type="cxxfe.ast.types.FloatType" uuid="3d34c024-43d8-4366-8a97-2ad7bbe94a81"/>
+        <Name>__float80</Name>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.FloatType" uuid="e9cb68c9-089d-4164-b0a3-dc3add35f418">
+        <Kind>Float128</Kind>
+        <NumBits>128</NumBits>
+        <Name>__float128</Name>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.TypedefType" uuid="94963a34-da59-44fb-900d-da4c30d95969">
+        <Type type="cxxfe.ast.types.FloatType" uuid="e9cb68c9-089d-4164-b0a3-dc3add35f418"/>
+        <Name>__float128</Name>
+      </Symbols>
+      <Symbols type="cxxfe.ast.Template" uuid="d39fd729-2366-4cbe-bd16-887176a9a8ec">
+        <Kind>Class</Kind>
+        <ProtoTypeInstantiation type="cxxfe.ast.types.StructType" uuid="15044752-e6d4-4c83-a9a3-fecabcab0418"/>
+        <Name>__make_integer_seq</Name>
+        <Scope type="cxxfe.ast.Scope" uuid="9c63bb0e-d361-4669-89fe-4cd64c06f33e">
+          <Symbols type="cxxfe.ast.types.TemplateParamType" uuid="2eb0a4f7-423a-4049-bf10-c961477ebde1">
+            <Name>T</Name>
+          </Symbols>
+        </Scope>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.StructType" uuid="15044752-e6d4-4c83-a9a3-fecabcab0418">
+        <Annotations type="mwAnnotation.ClassAnnotation" uuid="6b403d32-b3c7-42a1-a566-2b82849348e3">
+          <integrationStatus type="mwAnnotation.IntegrationStatus" uuid="839b3730-dc44-4485-a56f-6094d5b92040">
+            <definitionStatus>Inaccessible</definitionStatus>
+          </integrationStatus>
+        </Annotations>
+        <Linkage>ExternalCXX</Linkage>
+        <NeedsImplicitConstructor>true</NeedsImplicitConstructor>
+        <NeedsImplicitCopyConstructor>true</NeedsImplicitCopyConstructor>
+        <AssocTemplate type="cxxfe.ast.Template" uuid="d39fd729-2366-4cbe-bd16-887176a9a8ec"/>
+        <IsIncomplete>true</IsIncomplete>
+        <IsTemplatePrototype>true</IsTemplatePrototype>
+        <TemplateArgs type="cxxfe.ast.TemplateArg" uuid="07afff03-854d-432a-9f42-5678556d3229">
+          <Kind>TemplateTemplate</Kind>
+          <Name>templateTemplateParam</Name>
+        </TemplateArgs>
+        <TemplateArgs type="cxxfe.ast.TemplateArg" uuid="37965594-08fb-4e55-a6f8-cdcc4a4df9e6">
+          <Kind>Type</Kind>
+          <Type type="cxxfe.ast.types.TemplateParamType" uuid="2eb0a4f7-423a-4049-bf10-c961477ebde1"/>
+        </TemplateArgs>
+        <TemplateArgs type="cxxfe.ast.TemplateArg" uuid="ac1cc94f-570f-47d6-8792-e1864e162fa9">
+          <Kind>NonType</Kind>
+          <Val type="cxxfe.ast.constants.TemplateParamConstant" uuid="39717aba-4da0-4946-ae6b-c6723f79dd3f"/>
+        </TemplateArgs>
+        <Name>__make_integer_seq</Name>
+      </Symbols>
+      <Symbols type="cxxfe.ast.Template" uuid="f08611e7-89e6-4328-8972-6e6ae808286e">
+        <Kind>Class</Kind>
+        <ProtoTypeInstantiation type="cxxfe.ast.types.TypedefType" uuid="47715d32-6e87-40f1-b315-7350a31a0649"/>
+        <Name>__make_integer_seq_alias</Name>
+        <Scope type="cxxfe.ast.Scope" uuid="72a94e52-dd87-4adf-84ac-1149fc987104">
+          <Symbols type="cxxfe.ast.types.TemplateParamType" uuid="d9859095-12b6-4b0e-b58a-bcd7ee2c8529">
+            <Name>T</Name>
+          </Symbols>
+        </Scope>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.TypedefType" uuid="47715d32-6e87-40f1-b315-7350a31a0649">
+        <AssocTemplate type="cxxfe.ast.Template" uuid="f08611e7-89e6-4328-8972-6e6ae808286e"/>
+        <IsAlias>true</IsAlias>
+        <IsDependent>true</IsDependent>
+        <IsPrototypeInstantiation>true</IsPrototypeInstantiation>
+        <IsTemplateAlias>true</IsTemplateAlias>
+        <TemplateArgs type="cxxfe.ast.TemplateArg" uuid="705862b4-16c0-4f12-8f1b-2622b0a9b79a">
+          <Kind>TemplateTemplate</Kind>
+          <Name>templateTemplateParam</Name>
+        </TemplateArgs>
+        <TemplateArgs type="cxxfe.ast.TemplateArg" uuid="c4749c73-3d75-4c0a-af1a-9cbf25ae3711">
+          <Kind>Type</Kind>
+          <Type type="cxxfe.ast.types.TemplateParamType" uuid="d9859095-12b6-4b0e-b58a-bcd7ee2c8529"/>
+        </TemplateArgs>
+        <TemplateArgs type="cxxfe.ast.TemplateArg" uuid="24df89a2-c00d-4f40-b8af-aa788eaac00f">
+          <Kind>NonType</Kind>
+          <Val type="cxxfe.ast.constants.TemplateParamConstant" uuid="ad268ecb-4fcd-44b2-a842-be917e7a3c54"/>
+        </TemplateArgs>
+        <Type type="cxxfe.ast.types.TemplateParamType" uuid="d9859095-12b6-4b0e-b58a-bcd7ee2c8529"/>
+        <Name>__make_integer_seq_alias</Name>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.IntegerType" uuid="60a2938d-607b-4a77-a328-9ab44a6eef1a">
+        <IsSigned>false</IsSigned>
+        <Kind>UnsignedLongLong</Kind>
+        <NumBits>64</NumBits>
+        <Name>unsigned long long</Name>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.TypedefType" uuid="48a42918-7b23-4c19-94e3-d573f2699494">
+        <Type type="cxxfe.ast.types.IntegerType" uuid="60a2938d-607b-4a77-a328-9ab44a6eef1a"/>
+        <Name>size_t</Name>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.VoidType" uuid="7ecc921f-4f8d-4d54-9d94-0caf9375116c">
+        <Name>void</Name>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.PointerType" uuid="b6c58fcc-21ec-4efd-bb42-7e6752832e4b">
+        <Type type="cxxfe.ast.types.VoidType" uuid="7ecc921f-4f8d-4d54-9d94-0caf9375116c"/>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.LValueReferenceType" uuid="6bf46e94-a0b2-450a-8442-61bf15c4cb18">
+        <Type type="cxxfe.ast.types.StructType" uuid="5b19bea4-a440-46dd-8c5f-163f90ebb19a"/>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.QualifiedType" uuid="2be72b6b-5498-4f55-be75-040d811e9dee">
+        <IsConst>true</IsConst>
+        <Type type="cxxfe.ast.types.StructType" uuid="5b19bea4-a440-46dd-8c5f-163f90ebb19a"/>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.LValueReferenceType" uuid="1f473bcc-c97c-4409-810d-cc7efffc02bb">
+        <Type type="cxxfe.ast.types.QualifiedType" uuid="2be72b6b-5498-4f55-be75-040d811e9dee"/>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.FunctionType" uuid="cfdcf32e-5ddf-4d66-9326-d6a5b970fb9c">
+        <ParamTypes type="cxxfe.ast.types.LValueReferenceType" uuid="1f473bcc-c97c-4409-810d-cc7efffc02bb"/>
+        <RetType type="cxxfe.ast.types.LValueReferenceType" uuid="6bf46e94-a0b2-450a-8442-61bf15c4cb18"/>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.RValueReferenceType" uuid="bbf34c55-594f-4c86-812e-63cbabbc843b">
+        <Type type="cxxfe.ast.types.StructType" uuid="5b19bea4-a440-46dd-8c5f-163f90ebb19a"/>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.FunctionType" uuid="dded2a1f-7820-4656-a4ef-756c0306a306">
+        <ParamTypes type="cxxfe.ast.types.RValueReferenceType" uuid="bbf34c55-594f-4c86-812e-63cbabbc843b"/>
+        <RetType type="cxxfe.ast.types.LValueReferenceType" uuid="6bf46e94-a0b2-450a-8442-61bf15c4cb18"/>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.StructType" uuid="5b19bea4-a440-46dd-8c5f-163f90ebb19a">
+        <Annotations type="mwAnnotation.ClassAnnotation" uuid="a8ef90e1-20a9-4596-b2ec-91fe46aa1ff3">
+          <deallocatorPTKey>D/BS_Simulink</deallocatorPTKey>
+          <description>clib.Wrapper.Simulink    Representation of C++ class BS_Simulink.</description>
+          <implicitConstructors type="mwAnnotation.FunctionAnnotation" uuid="91329a3a-4278-4997-9833-ab56f20706ca">
+            <cppSignature>BS_Simulink::BS_Simulink()</cppSignature>
+            <description>clib.Wrapper.Simulink    Constructor of C++ class BS_Simulink.</description>
+            <name>BS_Simulink</name>
+            <ptKey>A/BS_Simulink</ptKey>
+            <integrationStatus type="mwAnnotation.IntegrationStatus" uuid="79df2e7d-a405-49e7-adf9-53840edbb98f"/>
+          </implicitConstructors>
+          <implicitConstructors type="mwAnnotation.FunctionAnnotation" uuid="967aeef3-24ca-4c84-a715-4f4ac32672e8">
+            <cppSignature>BS_Simulink::BS_Simulink(BS_Simulink const &amp; input1)</cppSignature>
+            <description>clib.Wrapper.Simulink    Constructor of C++ class BS_Simulink.</description>
+            <inputs type="mwAnnotation.Argument" uuid="bb4052d7-568e-4fd2-899d-db6fb2bf7017">
+              <cppPosition>1</cppPosition>
+              <cppType>[BS_Simulink]ConstRef</cppType>
+              <isConstData>true</isConstData>
+              <mwType>clib.Wrapper.Simulink</mwType>
+              <name>input1</name>
+              <validTypes>clib.Wrapper.Simulink</validTypes>
+            </inputs>
+            <name>BS_Simulink</name>
+            <ptKey>A/BS_Simulink@[BS_Simulink]ConstRef</ptKey>
+            <integrationStatus type="mwAnnotation.IntegrationStatus" uuid="668e73b9-41db-4134-8cbd-7519c4514c7b"/>
+          </implicitConstructors>
+          <isAssignable>true</isAssignable>
+          <isDestructible>true</isDestructible>
+          <name>clib.Wrapper.Simulink</name>
+          <needArray>true</needArray>
+          <integrationStatus type="mwAnnotation.IntegrationStatus" uuid="145c4dd8-6faf-4fc6-a009-97c3fc47bdbd"/>
+        </Annotations>
+        <Linkage>ExternalCXX</Linkage>
+        <Methods type="cxxfe.ast.types.Method" uuid="2df352a5-469a-4623-8dff-c965fea3f0cd">
+          <Annotations type="mwAnnotation.FunctionAnnotation" uuid="8738bee8-372c-403e-ab8e-e772899e0690">
+            <integrationStatus type="mwAnnotation.IntegrationStatus" uuid="baf24d62-743b-4160-92c8-41f0e509c919">
+              <definitionStatus>Inaccessible</definitionStatus>
+            </integrationStatus>
+          </Annotations>
+          <IsCompilerGenerated>true</IsCompilerGenerated>
+          <IsInline>true</IsInline>
+          <Params type="cxxfe.ast.Variable" uuid="f1aa121c-01f0-43f4-8cd0-8e2dc04e13b2">
+            <Type type="cxxfe.ast.types.LValueReferenceType" uuid="1f473bcc-c97c-4409-810d-cc7efffc02bb"/>
+          </Params>
+          <SpecialKind>Operator</SpecialKind>
+          <Linkage>ExternalCXX</Linkage>
+          <Type type="cxxfe.ast.types.FunctionType" uuid="cfdcf32e-5ddf-4d66-9326-d6a5b970fb9c"/>
+          <Name>operator=</Name>
+          <DefPos type="cxxfe.ast.source.SourcePosition" uuid="ab22a713-75c9-4f33-8c16-6af4714ebbb9">
+            <Col>8</Col>
+            <File type="cxxfe.ast.source.SourceFile" uuid="85834777-4858-4469-8ec5-77728cde8941"/>
+            <Line>17</Line>
+          </DefPos>
+        </Methods>
+        <Methods type="cxxfe.ast.types.Method" uuid="62de3449-365c-4abb-a1f7-26cd26894b10">
+          <Annotations type="mwAnnotation.FunctionAnnotation" uuid="22320381-11e6-4b88-b367-de045a71a46b">
+            <integrationStatus type="mwAnnotation.IntegrationStatus" uuid="3ae845e7-a67d-43a0-83d9-7693eeadea2e">
+              <definitionStatus>Inaccessible</definitionStatus>
+            </integrationStatus>
+          </Annotations>
+          <IsCompilerGenerated>true</IsCompilerGenerated>
+          <IsInline>true</IsInline>
+          <Params type="cxxfe.ast.Variable" uuid="9b416f53-1b7f-4804-a217-21da63b26286">
+            <Type type="cxxfe.ast.types.RValueReferenceType" uuid="bbf34c55-594f-4c86-812e-63cbabbc843b"/>
+          </Params>
+          <SpecialKind>Operator</SpecialKind>
+          <Linkage>ExternalCXX</Linkage>
+          <Type type="cxxfe.ast.types.FunctionType" uuid="dded2a1f-7820-4656-a4ef-756c0306a306"/>
+          <Name>operator=</Name>
+          <DefPos type="cxxfe.ast.source.SourcePosition" uuid="264fc9e0-2ef4-4f99-81f0-56d2c66e98fd">
+            <Col>8</Col>
+            <File type="cxxfe.ast.source.SourceFile" uuid="85834777-4858-4469-8ec5-77728cde8941"/>
+            <Line>17</Line>
+          </DefPos>
+        </Methods>
+        <NeedsImplicitConstructor>true</NeedsImplicitConstructor>
+        <NeedsImplicitCopyConstructor>true</NeedsImplicitCopyConstructor>
+        <Members type="cxxfe.ast.types.Member" uuid="87b2652c-7b9d-4972-9f8f-e6e153945730">
+          <Access>Public</Access>
+          <Annotations type="mwAnnotation.VariableAnnotation" uuid="2e646e46-78b9-496b-a81a-1717d1528cd5">
+            <integrationStatus type="mwAnnotation.IntegrationStatus" uuid="37d720d0-7a44-44b5-a5dd-562365fb2a5c">
+              <definitionStatus>Unsupported</definitionStatus>
+            </integrationStatus>
+          </Annotations>
+          <Type type="cxxfe.ast.types.PointerType" uuid="b6c58fcc-21ec-4efd-bb42-7e6752832e4b"/>
+          <Name>BS</Name>
+          <DefPos type="cxxfe.ast.source.SourcePosition" uuid="7fb80741-6b88-47cc-b47c-8861c5366117">
+            <Col>8</Col>
+            <File type="cxxfe.ast.source.SourceFile" uuid="85834777-4858-4469-8ec5-77728cde8941"/>
+            <Line>18</Line>
+          </DefPos>
+        </Members>
+        <Name>BS_Simulink</Name>
+        <Scope type="cxxfe.ast.Scope" uuid="06a80ac6-1f60-473a-8114-dbe556a723e9">
+          <Annotations type="mwAnnotation.ScopeAnnotation" uuid="90c3e8e3-5b44-4f93-98f0-5fbf6b765db6">
+            <integrationStatus type="mwAnnotation.IntegrationStatus" uuid="158e874c-0932-47ca-8a37-8444835505fd"/>
+          </Annotations>
+        </Scope>
+        <DefPos type="cxxfe.ast.source.SourcePosition" uuid="42958339-2abc-4427-859b-0625d744e1da">
+          <Col>8</Col>
+          <File type="cxxfe.ast.source.SourceFile" uuid="85834777-4858-4469-8ec5-77728cde8941"/>
+          <Line>17</Line>
+        </DefPos>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.TypedefType" uuid="12a2f7a1-0ee7-420d-91e8-1b335f77bb52">
+        <Type type="cxxfe.ast.types.StructType" uuid="5b19bea4-a440-46dd-8c5f-163f90ebb19a"/>
+        <Name>Simulink</Name>
+        <DefPos type="cxxfe.ast.source.SourcePosition" uuid="3d9ad28f-0ed0-4774-88ae-832020d53f32">
+          <Col>28</Col>
+          <File type="cxxfe.ast.source.SourceFile" uuid="85834777-4858-4469-8ec5-77728cde8941"/>
+          <Line>20</Line>
+        </DefPos>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.FunctionType" uuid="9c25764b-f254-49f1-bbf9-00fe088dfae9">
+        <ParamTypes type="cxxfe.ast.types.IntegerType" uuid="60a2938d-607b-4a77-a328-9ab44a6eef1a"/>
+        <RetType type="cxxfe.ast.types.PointerType" uuid="b6c58fcc-21ec-4efd-bb42-7e6752832e4b"/>
+      </Symbols>
+      <Symbols type="cxxfe.ast.Function" uuid="4d98e9ef-116b-4ffa-b91c-3705f62dc397">
+        <Annotations type="mwAnnotation.FunctionAnnotation" uuid="1b294960-cbd1-462e-b403-46b2fae881be">
+          <integrationStatus type="mwAnnotation.IntegrationStatus" uuid="17a76c23-9a04-4d3c-bb00-7beb2e36333b">
+            <definitionStatus>Inaccessible</definitionStatus>
+          </integrationStatus>
+        </Annotations>
+        <IsCompilerGenerated>true</IsCompilerGenerated>
+        <Params type="cxxfe.ast.Variable" uuid="aa87fa04-571b-4cbf-9aca-4c3efa6070e4">
+          <Type type="cxxfe.ast.types.IntegerType" uuid="60a2938d-607b-4a77-a328-9ab44a6eef1a"/>
+        </Params>
+        <SpecialKind>Operator</SpecialKind>
+        <StorageClass>Extern</StorageClass>
+        <Type type="cxxfe.ast.types.FunctionType" uuid="9c25764b-f254-49f1-bbf9-00fe088dfae9"/>
+        <Name>operator new</Name>
+        <DefPos type="cxxfe.ast.source.SourcePosition" uuid="af8c21f4-4649-4ac0-ad76-cc918bac6cfb"/>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.FunctionType" uuid="2d0fa331-5633-4e13-88b1-b28f0b200611">
+        <ParamTypes type="cxxfe.ast.types.PointerType" uuid="b6c58fcc-21ec-4efd-bb42-7e6752832e4b"/>
+        <RetType type="cxxfe.ast.types.VoidType" uuid="7ecc921f-4f8d-4d54-9d94-0caf9375116c"/>
+      </Symbols>
+      <Symbols type="cxxfe.ast.Function" uuid="1ec48762-8bf9-4672-8d26-4cdc3d85b0da">
+        <Annotations type="mwAnnotation.FunctionAnnotation" uuid="3b77586d-8473-48bd-9921-19c81390a198">
+          <integrationStatus type="mwAnnotation.IntegrationStatus" uuid="7d8803e3-2513-4b4f-811b-ddaad46a0af8">
+            <definitionStatus>Inaccessible</definitionStatus>
+          </integrationStatus>
+        </Annotations>
+        <IsCompilerGenerated>true</IsCompilerGenerated>
+        <Params type="cxxfe.ast.Variable" uuid="9cb0a9c5-1cea-4135-8767-f2487eede9b3">
+          <Type type="cxxfe.ast.types.PointerType" uuid="b6c58fcc-21ec-4efd-bb42-7e6752832e4b"/>
+        </Params>
+        <SpecialKind>Operator</SpecialKind>
+        <StorageClass>Extern</StorageClass>
+        <Type type="cxxfe.ast.types.FunctionType" uuid="2d0fa331-5633-4e13-88b1-b28f0b200611"/>
+        <Name>operator delete</Name>
+        <DefPos type="cxxfe.ast.source.SourcePosition" uuid="7c813583-8e5f-4709-aea3-3e430b61f1af"/>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.FunctionType" uuid="eef1947a-52b4-4388-8a8e-c3c97ede4acf">
+        <ParamTypes type="cxxfe.ast.types.PointerType" uuid="b6c58fcc-21ec-4efd-bb42-7e6752832e4b"/>
+        <ParamTypes type="cxxfe.ast.types.IntegerType" uuid="60a2938d-607b-4a77-a328-9ab44a6eef1a"/>
+        <RetType type="cxxfe.ast.types.VoidType" uuid="7ecc921f-4f8d-4d54-9d94-0caf9375116c"/>
+      </Symbols>
+      <Symbols type="cxxfe.ast.Function" uuid="c4c325b6-0b1f-4dad-bd22-23108fd52f2e">
+        <Annotations type="mwAnnotation.FunctionAnnotation" uuid="12490457-7f2c-441f-9609-4b453133b548">
+          <integrationStatus type="mwAnnotation.IntegrationStatus" uuid="c6323419-01ea-4f76-9484-1ecef56e2586">
+            <definitionStatus>Inaccessible</definitionStatus>
+          </integrationStatus>
+        </Annotations>
+        <IsCompilerGenerated>true</IsCompilerGenerated>
+        <Params type="cxxfe.ast.Variable" uuid="9f43db91-d795-4969-a88e-4b661859a034">
+          <Type type="cxxfe.ast.types.PointerType" uuid="b6c58fcc-21ec-4efd-bb42-7e6752832e4b"/>
+        </Params>
+        <Params type="cxxfe.ast.Variable" uuid="1c3150c7-747e-4b9d-b46b-ac3d28b64e24">
+          <Type type="cxxfe.ast.types.IntegerType" uuid="60a2938d-607b-4a77-a328-9ab44a6eef1a"/>
+        </Params>
+        <SpecialKind>Operator</SpecialKind>
+        <StorageClass>Extern</StorageClass>
+        <Type type="cxxfe.ast.types.FunctionType" uuid="eef1947a-52b4-4388-8a8e-c3c97ede4acf"/>
+        <Name>operator delete</Name>
+        <DefPos type="cxxfe.ast.source.SourcePosition" uuid="db16cebe-1f5c-4177-a803-a8a36686cf3d"/>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.PointerType" uuid="fbbc2465-77fa-46bd-a4f6-6e0917392a91">
+        <Type type="cxxfe.ast.types.StructType" uuid="5b19bea4-a440-46dd-8c5f-163f90ebb19a"/>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.FunctionType" uuid="8fc01f52-50f0-41eb-9400-934ed0647808">
+        <RetType type="cxxfe.ast.types.PointerType" uuid="fbbc2465-77fa-46bd-a4f6-6e0917392a91"/>
+      </Symbols>
+      <Symbols type="cxxfe.ast.Function" uuid="9f8e4a7d-bf19-4fc6-9b55-2a5eb0f4f1cb">
+        <Annotations type="mwAnnotation.FunctionAnnotation" uuid="26b3582a-f487-437d-bf59-5c91d0b35cf8">
+          <cppSignature>BS_Simulink * newSimulink()</cppSignature>
+          <cppSignatureFcnType>BS_Simulink *(*)()</cppSignatureFcnType>
+          <cppType>[BS_Simulink]Ptr</cppType>
+          <description>clib.Wrapper.newSimulink    Representation of C++ function newSimulink.</description>
+          <name>clib.Wrapper.newSimulink</name>
+          <outputs type="mwAnnotation.Argument" uuid="67ab9a31-b8a0-436a-9367-d3bfeb91bf51">
+            <cppType>[BS_Simulink]Ptr</cppType>
+            <direction>Out</direction>
+            <mwType>clib.Wrapper.Simulink</mwType>
+            <name>RetVal</name>
+            <shape>Undefined</shape>
+            <storage>Pointer</storage>
+            <validTypes>clib.Wrapper.Simulink</validTypes>
+          </outputs>
+          <ptKey>F/newSimulink#[BS_Simulink]Ptr</ptKey>
+          <integrationStatus type="mwAnnotation.IntegrationStatus" uuid="99f360dd-16d4-4be5-ba80-bfd401e698df">
+            <definitionStatus>PartiallySpecified</definitionStatus>
+          </integrationStatus>
+        </Annotations>
+        <StorageClass>Extern</StorageClass>
+        <Type type="cxxfe.ast.types.FunctionType" uuid="8fc01f52-50f0-41eb-9400-934ed0647808"/>
+        <Name>newSimulink</Name>
+        <DeclPos type="cxxfe.ast.source.SourcePosition" uuid="738f8b81-2a25-428c-8794-02fb51c23736">
+          <Col>24</Col>
+          <File type="cxxfe.ast.source.SourceFile" uuid="85834777-4858-4469-8ec5-77728cde8941"/>
+          <Line>22</Line>
+        </DeclPos>
+        <DeclPos type="cxxfe.ast.source.SourcePosition" uuid="58141ae2-cb0b-4c37-b4e1-552c26292087">
+          <Col>24</Col>
+          <File type="cxxfe.ast.source.SourceFile" uuid="85834777-4858-4469-8ec5-77728cde8941"/>
+          <Line>22</Line>
+        </DeclPos>
+        <DefPos type="cxxfe.ast.source.SourcePosition" uuid="31fb6fba-ef58-466d-83aa-055e27d4ad47">
+          <Col>24</Col>
+          <File type="cxxfe.ast.source.SourceFile" uuid="85834777-4858-4469-8ec5-77728cde8941"/>
+          <Line>22</Line>
+        </DefPos>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.IntegerType" uuid="6c042dcd-df19-4466-b8ec-1c44104f4d2e">
+        <NumBits>32</NumBits>
+        <Name>int</Name>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.FunctionType" uuid="4ecfd156-dc33-415a-a2ce-963e912f4f64">
+        <ParamTypes type="cxxfe.ast.types.PointerType" uuid="fbbc2465-77fa-46bd-a4f6-6e0917392a91"/>
+        <ParamTypes type="cxxfe.ast.types.IntegerType" uuid="6c042dcd-df19-4466-b8ec-1c44104f4d2e"/>
+        <RetType type="cxxfe.ast.types.VoidType" uuid="7ecc921f-4f8d-4d54-9d94-0caf9375116c"/>
+      </Symbols>
+      <Symbols type="cxxfe.ast.Function" uuid="fc6611ad-78d1-405a-b329-d676df69b68a">
+        <Annotations type="mwAnnotation.FunctionAnnotation" uuid="d67eb855-ec62-4cb9-bd67-46543fb154f2">
+          <cppSignature>void BS_initialize(BS_Simulink * Simulink,int n)</cppSignature>
+          <cppSignatureFcnType>void(*)(BS_Simulink *, int)</cppSignatureFcnType>
+          <cppType>[void]</cppType>
+          <description>clib.Wrapper.BS_initialize    Representation of C++ function BS_initialize.</description>
+          <inputs type="mwAnnotation.Argument" uuid="becb2708-ad3d-48d2-bc18-6542c615833c">
+            <cppPosition>1</cppPosition>
+            <cppType>[BS_Simulink]Ptr</cppType>
+            <mwType>clib.Wrapper.Simulink</mwType>
+            <name>Simulink</name>
+            <shape>Undefined</shape>
+            <storage>Pointer</storage>
+            <validTypes>clib.Wrapper.Simulink</validTypes>
+            <validTypes>clib.array.Wrapper.Simulink</validTypes>
+          </inputs>
+          <inputs type="mwAnnotation.Argument" uuid="bc1b518b-6778-43a6-a578-348c2fe689a9">
+            <cppPosition>2</cppPosition>
+            <cppType>[int]</cppType>
+            <mwType>int32</mwType>
+            <name>n</name>
+            <storage>Value</storage>
+            <validTypes>int32</validTypes>
+          </inputs>
+          <name>clib.Wrapper.BS_initialize</name>
+          <ptKey>F/BS_initialize@[BS_Simulink]Ptr,[int]#[void]</ptKey>
+          <integrationStatus type="mwAnnotation.IntegrationStatus" uuid="abba00ba-4f32-4e5c-9d9c-5507e44b059e">
+            <definitionStatus>PartiallySpecified</definitionStatus>
+          </integrationStatus>
+        </Annotations>
+        <Params type="cxxfe.ast.Variable" uuid="8cdb0261-6626-4156-980f-326ac355fe79">
+          <Type type="cxxfe.ast.types.PointerType" uuid="fbbc2465-77fa-46bd-a4f6-6e0917392a91"/>
+          <Name>Simulink</Name>
+        </Params>
+        <Params type="cxxfe.ast.Variable" uuid="b70b4088-54c9-4cbc-bfae-59395faba22c">
+          <Type type="cxxfe.ast.types.IntegerType" uuid="6c042dcd-df19-4466-b8ec-1c44104f4d2e"/>
+          <Name>n</Name>
+        </Params>
+        <StorageClass>Extern</StorageClass>
+        <Type type="cxxfe.ast.types.FunctionType" uuid="4ecfd156-dc33-415a-a2ce-963e912f4f64"/>
+        <Name>BS_initialize</Name>
+        <DeclPos type="cxxfe.ast.source.SourcePosition" uuid="77f6c160-0abf-4c8f-b0fa-3c387f06abe4">
+          <Col>17</Col>
+          <File type="cxxfe.ast.source.SourceFile" uuid="85834777-4858-4469-8ec5-77728cde8941"/>
+          <Line>23</Line>
+        </DeclPos>
+        <DeclPos type="cxxfe.ast.source.SourcePosition" uuid="3920de5f-2ddb-4b0a-994b-933e3bf0d5df">
+          <Col>17</Col>
+          <File type="cxxfe.ast.source.SourceFile" uuid="85834777-4858-4469-8ec5-77728cde8941"/>
+          <Line>23</Line>
+        </DeclPos>
+        <DefPos type="cxxfe.ast.source.SourcePosition" uuid="23bd57ec-c1c3-48bf-9c94-7db9fd7b8f70">
+          <Col>17</Col>
+          <File type="cxxfe.ast.source.SourceFile" uuid="85834777-4858-4469-8ec5-77728cde8941"/>
+          <Line>23</Line>
+        </DefPos>
+      </Symbols>
+      <Symbols type="cxxfe.ast.types.FunctionType" uuid="748bd844-0a0f-4afb-bb92-53058d0e7f26">
+        <ParamTypes type="cxxfe.ast.types.PointerType" uuid="fbbc2465-77fa-46bd-a4f6-6e0917392a91"/>
+        <RetType type="cxxfe.ast.types.IntegerType" uuid="6c042dcd-df19-4466-b8ec-1c44104f4d2e"/>
+      </Symbols>
+      <Symbols type="cxxfe.ast.Function" uuid="c1b3455c-7175-49d3-be62-d8d88e1e3a12">
+        <Annotations type="mwAnnotation.FunctionAnnotation" uuid="4abe608f-3dfe-45f2-be65-69b7b68f6efe">
+          <cppSignature>int BS_sum(BS_Simulink * Simulink)</cppSignature>
+          <cppSignatureFcnType>int(*)(BS_Simulink *)</cppSignatureFcnType>
+          <cppType>[int]</cppType>
+          <description>clib.Wrapper.BS_sum    Representation of C++ function BS_sum.</description>
+          <inputs type="mwAnnotation.Argument" uuid="4ed02633-a225-43c3-837c-81e73cc719ea">
+            <cppPosition>1</cppPosition>
+            <cppType>[BS_Simulink]Ptr</cppType>
+            <mwType>clib.Wrapper.Simulink</mwType>
+            <name>Simulink</name>
+            <shape>Undefined</shape>
+            <storage>Pointer</storage>
+            <validTypes>clib.Wrapper.Simulink</validTypes>
+            <validTypes>clib.array.Wrapper.Simulink</validTypes>
+          </inputs>
+          <name>clib.Wrapper.BS_sum</name>
+          <outputs type="mwAnnotation.Argument" uuid="c4b1c7fa-0f3c-4b1c-abc3-06afb5ed4789">
+            <cppType>[int]</cppType>
+            <direction>Out</direction>
+            <isOwned>true</isOwned>
+            <mwType>int32</mwType>
+            <name>RetVal</name>
+            <storage>Value</storage>
+            <validTypes>int32</validTypes>
+          </outputs>
+          <ptKey>F/BS_sum@[BS_Simulink]Ptr#[int]</ptKey>
+          <integrationStatus type="mwAnnotation.IntegrationStatus" uuid="785c4650-e32d-4dab-b627-9c0e7be9dabd">
+            <definitionStatus>PartiallySpecified</definitionStatus>
+          </integrationStatus>
+        </Annotations>
+        <Params type="cxxfe.ast.Variable" uuid="03d57b4c-2ac5-4b81-b365-3c0540f90f2e">
+          <Type type="cxxfe.ast.types.PointerType" uuid="fbbc2465-77fa-46bd-a4f6-6e0917392a91"/>
+          <Name>Simulink</Name>
+        </Params>
+        <StorageClass>Extern</StorageClass>
+        <Type type="cxxfe.ast.types.FunctionType" uuid="748bd844-0a0f-4afb-bb92-53058d0e7f26"/>
+        <Name>BS_sum</Name>
+        <DeclPos type="cxxfe.ast.source.SourcePosition" uuid="21e7b581-6a6d-4f86-a035-2ce0d918d869">
+          <Col>16</Col>
+          <File type="cxxfe.ast.source.SourceFile" uuid="85834777-4858-4469-8ec5-77728cde8941"/>
+          <Line>24</Line>
+        </DeclPos>
+        <DeclPos type="cxxfe.ast.source.SourcePosition" uuid="fe06e502-6ed8-4cf0-a2a7-57880a75724e">
+          <Col>16</Col>
+          <File type="cxxfe.ast.source.SourceFile" uuid="85834777-4858-4469-8ec5-77728cde8941"/>
+          <Line>24</Line>
+        </DeclPos>
+        <DefPos type="cxxfe.ast.source.SourcePosition" uuid="951863d2-f54f-4f33-9c14-cd38f59c6e8d">
+          <Col>16</Col>
+          <File type="cxxfe.ast.source.SourceFile" uuid="85834777-4858-4469-8ec5-77728cde8941"/>
+          <Line>24</Line>
+        </DefPos>
+      </Symbols>
+    </Compilations>
+    <Files type="cxxfe.ast.source.SourceFile" uuid="85834777-4858-4469-8ec5-77728cde8941">
+      <IsTopLevelFile>true</IsTopLevelFile>
+      <Path>C:\Users\kojik\Documents\GitHub\D-BRAIN\docs\MATLAB_cpp\include\BS_Simulink.h</Path>
+      <WrittenName>C:\Users\kojik\Documents\GitHub\D-BRAIN\docs\MATLAB_cpp\include\BS_Simulink.h</WrittenName>
+    </Files>
+    <LongDoubleNumBits>64</LongDoubleNumBits>
+    <PointerNumBits>64</PointerNumBits>
+    <PtrDiffTypeKind>SignedLongLong</PtrDiffTypeKind>
+    <SizeTypeKind>UnsignedLongLong</SizeTypeKind>
+  </cxxfe.ast.Project>
+</MF0>
