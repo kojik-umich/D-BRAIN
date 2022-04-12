@@ -143,15 +143,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ProjectReference Include="Domain.vcxproj">
+      <Project>{67460eba-137d-4f8e-9bc4-5cc2775e006b}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="..\src\BS_Simulink.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\BS_Simulink.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="Domain.vcxproj">
-      <Project>{67460eba-137d-4f8e-9bc4-5cc2775e006b}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

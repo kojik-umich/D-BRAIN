@@ -1,8 +1,9 @@
-lfile = "out\x64_Release\Wrapper\Wrapper.lib";
-hfile = "include\BS_Simulink.h";
-lname = "Wrapper";
+loadlibrary('out\x64_Release\Wrapper\Wrapper.dll', 'include\BS_Simulink.h');
 
-clibgen.generateLibraryDefinition ...
-    (hfile, "Libraries", lfile, "PackageName", lname);
+BS = calllib('Wrapper','new_BS');
 
+calllib('Wrapper','BS_initialize', BS, 10);
+expect45 = calllib('Wrapper','BS_sum', BS);
+
+expect45
 
